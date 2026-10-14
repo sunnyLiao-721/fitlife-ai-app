@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#F9F3EA">
+  <title>FitLife AI｜米白奶茶手機版</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; font-family: system-ui, sans-serif;
+      background: #f4f7f5; color: #20352c;
+    }
+    header { background: #8B5E42; color: white; padding: 24px 18px; }
+    header h1 { margin: 0 0 6px; font-size: 26px; }
+    header p { margin: 0; opacity: .9; }
+    main { max-width: 850px; margin: auto; padding: 18px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(230px,1fr)); gap: 14px; }
+    .card { background: white; padding: 18px; border-radius: 16px; box-shadow: 0 3px 12px #163c2910; margin-bottom: 14px; }
+    h2 { font-size: 18px; margin-top: 0; }
+    .number { font-size: 28px; font-weight: 700; color: #8B5E42; }
+    input, button, select { font: inherit; padding: 10px; border-radius: 9px; }
+    input, select { width: 100%; border: 1px solid #ccd8d1; margin: 5px 0 10px; background: white; color: inherit; }
+    button { border: 0; background: #8B5E42; color: white; cursor: pointer; margin: 3px; }
+    button.secondary { background: #e1eee6; color: #8B5E42; }
+    li { margin: 8px 0; }
+    .muted { color: #79695D; font-size: 13px; }
+
+    /* 健身房訓練系統 */
+    .safety { background: #fff6e5; border: 1px solid #f0d9a8; }
+    .safety ul { padding-left: 20px; margin: 8px 0; }
+    .ex { border: 1px solid #E7D9C8; border-radius: 12px; padding: 14px; margin: 12px 0; }
+    .ex.done { background: #eef7f1; border-color: #9cc7b0; }
+    .ex h3 { margin: 0 0 8px; font-size: 17px; }
+    .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+    .tag { background: #e1eee6; color: #8B5E42; border-radius: 999px; padding: 3px 10px; font-size: 13px; }
+    .row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .row label, .alt label { font-size: 13px; color: #79695D; }
+    details { margin: 6px 0; }
+    summary { cursor: pointer; color: #8B5E42; font-weight: 600; padding: 4px 0; }
+    details p, details li { margin: 6px 0; font-size: 14px; line-height: 1.6; }
+    details ol { padding-left: 22px; margin: 4px 0; }
+    .warn { background: #fff6e5; border-radius: 8px; padding: 8px 10px; }
+    details ul { padding-left: 20px; margin: 4px 0; }
+    .guide section { border-left: 3px solid #9cc7b0; padding: 2px 0 2px 12px; margin: 14px 0; }
+    .guide section.warn { border-left-color: #e0b85c; padding: 8px 10px 8px 12px; }
+    .guide h4 { margin: 0 0 4px; font-size: 15px; color: #8B5E42; }
+    .dn { margin: 4px 0 8px; font-size: 17px; color: #20352c; }
+    .sub { margin: 12px 0 4px; font-size: 15px; color: #8B5E42; }
+    .figs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 8px 0; }
+    .figs figure { margin: 0; }
+    .imgbox { position: relative; aspect-ratio: 4 / 3; border-radius: 10px; overflow: hidden; background: #eef3f0; border: 1px dashed #b9cbc1; }
+    .imgbox img { display: block; width: 100%; height: 100%; object-fit: contain; background: white; }
+    .imgbox.ok { border-style: solid; }
+    .imgbox.ok img { display: block; }
+    .imgbox .ph { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 6px; color: #79695D; font-size: 13px; word-break: break-all; }
+    .imgbox .ph span { font-size: 11px; margin-top: 4px; }
+    .imgbox.ok .ph { display: none; }
+    .figs figcaption { font-size: 13px; line-height: 1.5; margin-top: 6px; }
+    .figs figcaption strong { display: block; color: #8B5E42; }
+    a.video { display: inline-block; color: #8B5E42; font-size: 14px; margin: 4px 0; }
+    .check { display: flex; align-items: center; gap: 8px; margin: 4px 0 0; font-weight: 600; }
+    .check input { width: 20px; height: 20px; margin: 0; }
+    .bar { height: 8px; background: #e1eee6; border-radius: 99px; overflow: hidden; margin: 8px 0; }
+    .bar div { height: 100%; background: #8B5E42; width: 0; }
+    .photo img { max-width: 100%; max-height: 320px; border-radius: 10px; display: block; margin: 8px 0; }
+    .photo input[type=file] { display: none; }
+    @media (max-width: 420px) { .row { grid-template-columns: 1fr; } }
+  
+  /* Mobile-first milk-tea design; original storage and logic preserved. */
+  :root {color-scheme:light;--bg:#F9F3EA;--surface:#FFFEFC;--surface2:#F3E8DA;--line:#E7D9C8;--ink:#382D27;--muted:#79695D;--accent:#8B5E42;}
+  body {background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Noto Sans TC",sans-serif;}
+  header {background:#FFFEFC;border-bottom:1px solid var(--line);padding:20px 18px 17px;}
+  header h1 {color:var(--accent);font-size:25px;}
+  header p {color:var(--muted);opacity:1;}
+  main {max-width:900px;padding:16px 13px 110px;}
+  .card {background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:0 5px 20px #62462A12;margin-bottom:13px;}
+  h2,h3,h4,.dn,.sub,.guide h4 {color:var(--ink);}
+  h2 {font-size:18px;}
+  .muted,.row label,.alt label,.imgbox .ph,details p,details li {color:var(--muted);}
+  .number {color:var(--accent);}
+  input,select,textarea {background:#FFFEFC!important;color:var(--ink)!important;border:1px solid #D8C5B1!important;min-height:43px;}
+  input[type="checkbox"] {min-height:unset;}
+  input::placeholder {color:#978577;}
+  button {background:#8B5E42;color:#FFFEFC;min-height:42px;font-weight:600;}
+  button.secondary {background:#F0E1D1;color:#71503A;}
+  button:focus-visible,.bottom-tab:focus-visible {outline:3px solid #B8825F;outline-offset:2px;}
+  .tag {background:#F0DFCB;color:#6E4C36;}
+  .ex,.imgbox {background:var(--surface2);border-color:var(--line);}
+  .ex.done {background:#EFE3D3;border-color:#D2B391;}
+  .bar {background:#E6D4BF;}.bar div {background:var(--accent);}
+  .safety,.warn {background:#FFFEFC6e3!important;border-color:#E1BC79!important;color:#75582D!important;}
+  a,a.video,summary {color:#795137;}
+  #weightTrendCards > div,#statsCards > div {border-color:var(--line)!important;}
+  #weightTrendCards > div > div:last-child {color:var(--accent)!important;}
+  [data-fit-panel] {display:none;}
+  [data-fit-panel].active {display:block;}
+  .fit-panel-heading {padding:7px 3px 13px;}
+  .fit-panel-heading h2 {margin:0 0 4px;font-size:23px;}
+  .fit-panel-heading p {margin:0;color:var(--muted);font-size:13px;}
+  .fit-tabs {position:fixed;z-index:50;bottom:0;left:0;right:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));background:#FFFEFC;border-top:1px solid #E7D9C8;padding:7px 5px max(8px,env(safe-area-inset-bottom));box-shadow:0 -5px 25px #65472D17;}
+  .bottom-tab {appearance:none;background:transparent!important;color:#827366;border:0;border-radius:12px;margin:0;padding:7px 0 5px;display:flex;flex-direction:column;align-items:center;gap:3px;min-height:55px;font-size:11px;font-weight:600;}
+  .bottom-tab .tab-icon {font-size:23px;line-height:1.15;}
+  .bottom-tab.active {background:#F1E3D3!important;color:#785037;}
+  .fit-quick {display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:0 0 14px;}
+  .fit-quick button {margin:0;padding:13px 7px;}
+  .fit-note {font-size:13px;color:var(--muted);line-height:1.6;}
+  .fit-placeholder {border:1px dashed #D6BFA7;border-radius:14px;padding:17px;background:#FAF2E9;}
+  .fit-placeholder strong {color:var(--accent);}
+  @media(min-width:750px){.fit-tabs {max-width:900px;left:50%;transform:translateX(-50%);border-left:1px solid var(--line);border-right:1px solid var(--line);border-radius:16px 16px 0 0;}.fit-quick {max-width:550px;}}
+
+</style>
+</head>
+<body>
+<header>
+  <h1>FitLife AI</h1>
+  <p>每天進步一點，打造更健康的自己</p>
+</header>
+<main>
+  <div class="grid">
+    <section class="card">
+      <h2>🔥 今日熱量</h2>
+      <div class="number"><span id="calories">0</span> kcal</div>
+      <p class="muted">記錄已吃下的食物熱量</p>
+      <label>食物名稱</label>
+      <input id="food" placeholder="例如：雞胸肉便當">
+      <label>熱量（大卡）</label>
+      <input id="calorieInput" type="number" min="0" placeholder="例如：450">
+      <label>蛋白質（克）</label>
+      <input id="proteinInput" type="number" min="0" placeholder="例如：30">
+      <button onclick="addFood()">新增飲食</button>
+      <ul id="foodList"></ul>
+    </section>
+    <section class="card">
+      <h2>💧 今日喝水</h2>
+      <div class="number"><span id="water">0</span> / 2000 ml</div>
+      <button onclick="addWater(250)">＋250 ml</button>
+      <button onclick="addWater(500)">＋500 ml</button>
+      <button class="secondary" onclick="resetWater()">重新計算</button>
+      <p class="muted">目標可依活動量與個人需求調整。</p>
+    </section>
+    <section class="card">
+      <h2>🥚 今日蛋白質</h2>
+      <div class="number"><span id="protein">0</span> g</div>
+      <p class="muted">食物紀錄的蛋白質加總</p>
+    </section>
+    <section class="card">
+      <h2>⚖️ 體重紀錄</h2>
+      <label>目前體重（kg）</label>
+      <input id="weightInput" type="number" min="1" max="500" step="0.1" placeholder="例如：85">
+      <button onclick="addWeight()">儲存體重</button>
+      <ul id="weightList"></ul>
+    </section>
+  </div>
+
+  <section class="card">
+    <h2>🏋️ 新手健身提醒</h2>
+    <p>先從能穩定控制、沒有疼痛的低負荷動作開始，逐步增加訓練量。</p>
+    <p>若有 L4-L5 椎間盤手術史，請依醫療專業人員的個別建議安排訓練；若出現新發腿部無力、會陰麻木或大小便控制異常，應立即就醫。</p>
+  </section>
+
+  <section class="card safety">
+    <h2>🛡️ 腰椎安全提醒</h2>
+    <p>沒有任何動作能保證對每個人都安全。開始本課表前，建議先請醫師或物理治療師確認適合的動作與重量。</p>
+    <ul>
+      <li>每次先熱身 5–10 分鐘（快走或固定式腳踏車），再做動作。</li>
+      <li>全程保持呼吸，不憋氣；腰部維持自然中立，不圓背、不過度反弓。</li>
+      <li>初期避免大重量彎腰負重、快速扭轉、跳躍及高衝擊動作。</li>
+      <li>輕微痠感請降低重量或縮小動作幅度；<strong>出現疼痛或神經症狀（腿麻、刺痛、無力、會陰麻木、大小便異常）請立即停止，並盡快尋求專業評估。</strong></li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>📅 健身房訓練（每週三天）</h2>
+    <p class="muted">健身工廠正光廠 2、3 樓：A 上半身器械、B 下半身器械、C 跑步機爬坡有氧紀錄。依身體恢復狀況安排訓練與休息；有氧強度以能說話、稍喘為參考。</p>
+    <div id="dayTabs"></div>
+    <div id="workoutBody"></div>
+    <p class="muted">A、B 重訓進階原則：姿勢穩定且無不適時才考慮小幅加重。C 爬坡有氧請從舒適的低坡度、短時間開始，不必追求高坡度。</p>
+    <button class="secondary" onclick="resetWorkout()">清除目前頁面今日紀錄</button>
+  </section>
+
+
+  <section class="card" id="weightTrendSection">
+    <h2>📈 體重與減脂趨勢</h2>
+    <p class="muted">讀取此瀏覽器已儲存的體重紀錄；同一天多次量測，以最後一次為準。圖表呈現體重變化，不能直接代表體脂變化。</p>
+    <label for="weightRange">查看期間</label>
+    <select id="weightRange" onchange="renderWeightTrend()">
+      <option value="7">最近 7 天</option><option value="30" selected>最近 30 天</option>
+      <option value="90">最近 90 天</option><option value="all">全部紀錄</option>
+    </select>
+    <div class="grid" id="weightTrendCards"></div>
+    <div id="weightTrendChart" style="margin:16px 0;overflow-x:auto"></div>
+    <label for="heightCm">身高（公分）</label>
+    <input id="heightCm" type="number" min="100" max="250" step="0.1" placeholder="例如：165">
+    <label for="targetWeight">目標體重（kg）</label>
+    <input id="targetWeight" type="number" min="1" max="500" step="0.1" placeholder="例如：75">
+    <button type="button" onclick="saveWeightGoals()">💾 儲存身高與目標</button>
+    <p id="weightGoalInfo" class="muted" aria-live="polite"></p>
+  </section>
+
+  <section class="card" id="historySection">
+    <h2>📅 歷史紀錄查詢</h2>
+    <p class="muted">選擇日期，唯讀查看當天的飲食、喝水、體重及 A／B／C 運動紀錄，不會修改原始資料。</p>
+    <label for="historyDate">查詢日期</label>
+    <input id="historyDate" type="date" onchange="renderHistory()">
+    <button type="button" class="secondary" onclick="renderHistory()">🔎 查詢紀錄</button>
+    <div id="historyResult" aria-live="polite"></div>
+  </section>
+
+  <section class="card" id="backupSection">
+    <h2>💾 資料備份與還原</h2>
+    <p class="muted">將此瀏覽器中的 FitLife AI 每日飲食、喝水、體重、A／B 訓練與 C 爬坡紀錄備份成 JSON 檔。備份檔請妥善保存，不要公開上傳。</p>
+    <button type="button" onclick="exportFitlifeBackup()">📤 下載完整備份（JSON）</button>
+    <hr style="border:0;border-top:1px solid #E7D9C8;margin:18px 0">
+    <label for="fitlifeBackupFile">📥 選擇之前下載的 FitLife AI 備份檔</label>
+    <input type="file" id="fitlifeBackupFile" accept=".json,application/json">
+    <button type="button" class="secondary" onclick="importFitlifeBackup()">檢查並還原備份</button>
+    <p class="muted">還原前會先驗證檔案、顯示筆數並要求確認。還原將覆蓋此瀏覽器中備份涵蓋的 FitLife AI 紀錄；不會修改圖片資料夾。建議先匯出現有紀錄備份。</p>
+  </section>
+
+  <section class="card" id="statsSection">
+    <h2>📊 健身進度統計</h2>
+    <p class="muted">以週一至週日為一週；每週目標為運動 3 天。A／B 只要當天至少勾選一個完成動作，就計入該課表一次；同一天多筆 C 爬坡合計為一個運動日。</p>
+    <div class="grid" id="statsCards"></div>
+    <h3>📈 最近 4 週運動趨勢</h3>
+    <div id="statsChart"></div>
+    <p class="muted">統計使用此瀏覽器既有的 A／B 每日紀錄與 C 爬坡紀錄；其他裝置或瀏覽器的資料不會自動同步。舊版若未保存某日訓練，無法補算。</p>
+  </section>
+
+  <p class="muted">第一版為本機瀏覽器紀錄工具，尚未連接真正的 AI 模型。教學影片連結為 YouTube 搜尋連結，請自行挑選示範清楚、來源可信的影片。動作照片只在目前頁面預覽，不會上傳、也不會儲存。</p>
+</main>
+<script>
+  const today = new Date().toLocaleDateString('sv-SE');
+const key = 'fitlife-' + today;
+
+let data = {
+  foods: [],
+  water: 0,
+  weights: [],
+  wDay: 'A',
+  w: {}
+};
+
+// 嘗試讀取之前的紀錄
+try {
+  const saved = localStorage.getItem(key);
+  if (saved) {
+    data = JSON.parse(saved);
+  }
+} catch (error) {
+  console.log('預覽模式：暫時無法使用瀏覽器儲存功能');
+}
+
+// 相容舊版資料（沒有訓練欄位時補上預設值）
+data.foods = data.foods || [];
+data.water = data.water || 0;
+data.weights = data.weights || [];
+data.wDay = data.wDay || 'A';
+data.w = data.w || {};
+
+// 儲存資料並更新畫面
+function save() {
+  try {
+    localStorage.setItem(key, JSON.stringify(data));
+  } catch (error) {
+    console.log('預覽模式：資料僅暫時保留');
+  }
+
+  render();
+}
+  function addFood() {
+    const name = document.getElementById('food').value.trim();
+    const calories = Number(document.getElementById('calorieInput').value);
+    const protein = Number(document.getElementById('proteinInput').value);
+    if (!name || calories < 0 || !Number.isFinite(calories) || protein < 0 || !Number.isFinite(protein)) {
+      alert('請輸入食物名稱、有效熱量及蛋白質數值。'); return;
+    }
+    data.foods.push({name, calories, protein});
+    document.getElementById('food').value = '';
+    document.getElementById('calorieInput').value = '';
+    document.getElementById('proteinInput').value = '';
+    save();
+  }
+  function addWater(amount) { data.water += amount; save(); }
+  function resetWater() { data.water = 0; save(); }
+  function addWeight() {
+    const weight = Number(document.getElementById('weightInput').value);
+    if (!Number.isFinite(weight) || weight <= 0 || weight > 500) {
+      alert('請輸入有效體重。'); return;
+    }
+    data.weights.push({date: today, weight});
+    document.getElementById('weightInput').value = '';
+    save();
+  }
+  function render() {
+    document.getElementById('calories').textContent = data.foods.reduce((s,f)=>s+f.calories,0);
+    document.getElementById('protein').textContent = data.foods.reduce((s,f)=>s+f.protein,0);
+    document.getElementById('water').textContent = data.water;
+    document.getElementById('foodList').innerHTML = data.foods.map(f=>`<li>${escapeText(f.name)}：${f.calories} kcal、蛋白質 ${f.protein} g</li>`).join('');
+    document.getElementById('weightList').innerHTML = data.weights.map(w=>`<li>${w.date}：${w.weight} kg</li>`).join('');
+    renderWorkout();
+  }
+  function escapeText(s) {
+    const el = document.createElement('span');
+    el.textContent = s;
+    return el.innerHTML;
+  }
+
+  /* ===== 健身房訓練系統 ===== */
+  // 完整教學動作庫（步驟以「|」分隔）
+  const LIB = {
+    chest: { n: '坐姿胸推機', cam: '側面，拍到頭、背部、椅背與手臂',
+      img: { start: '背部與臀部貼緊椅背，雙手握把手，手肘在身體兩側，手腕保持直立，肩膀放鬆下沉。重點關節：肩膀、手肘、手腕。',
+             end: '手臂接近伸直，手肘不鎖死；箭頭為向前推的方向。注意肩膀不要聳起、手腕不要向後折、背部不要離開椅背。' },
+      q: '坐姿胸推機 教學 新手', m: '胸大肌、三角肌前束、肱三頭肌',
+      eq: '坐姿胸推機。座椅高度調到把手約與胸口同高；背靠墊貼緊；插銷選最輕的重量開始。',
+      st: '坐穩，臀部與背貼緊椅背，雙腳平踩地面，雙手握把手，手腕在手肘正上方，肩膀放鬆下沉。',
+      sp: '確認把手與胸口同高、雙腳踩穩|吸氣，肩膀下沉，胸口微挺|吐氣，把手向前推到手臂接近伸直（手肘不鎖死）|在最前端停 1 秒|吸氣，約 3 秒慢慢讓把手回到胸口附近，不讓重量片撞擊|重複到目標次數，結束時慢慢放下',
+      br: '推出時吐氣，回放時吸氣，不要憋氣。',
+      er: '聳肩；手肘外開太寬；背離開椅背、腰部拱起；用甩的、重量片撞擊；手肘鎖死。',
+      nt: '以「最後兩下仍能維持姿勢」為重量標準；肩膀前側不適請降低重量。',
+      bk: '背部貼緊椅背可減少腰部代償；若腰部拱離椅背表示太重，請減重。腰部疼痛或腿麻請立即停止。',
+      g: {
+        muscles: {
+          main: '胸大肌（胸前最大的肌肉，負責把手臂向前推）',
+          assist: '三角肌前束（肩膀前側）、肱三頭肌（上臂後側，負責伸直手肘）、前鋸肌（幫忙穩定肩胛骨）'
+        },
+        setup: [
+          '調整座椅高度：坐下並握住把手時，把手應落在胸口（約乳頭）高度。太高或太低就重新調整座椅。',
+          '選擇重量：把插銷插在很輕的重量，以能輕鬆做 15 次的重量開始。若機器有起始位置踏桿，先調到手臂不會被拉到身體太後方。',
+          '身體位置：臀部坐到底，背部貼緊椅背，雙腳平踩地面或踏板，膝蓋約 90 度。',
+          '握法：雙手正握把手，拇指環繞把手；手腕保持直立，不向後折。',
+          '肩膀與手肘：肩膀往後下方放鬆（遠離耳朵），胸口微挺，手肘約在身體兩側、略低於肩膀。'
+        ],
+        steps: [
+          '預備：握穩把手，手肘彎曲，手肘與身體的夾角約 45–60 度，不要張開成 T 字形。',
+          '吸氣：肩膀往下沉、肩胛稍微往後收，胸口微挺，背部維持貼住椅背。',
+          '推出：吐氣，同時用胸口的力量把把手向前推，左右手同步，手腕保持直立。',
+          '頂端：推到手臂接近伸直（手肘留一點微彎、不鎖死），在最前面停 1 秒。',
+          '回程：吸氣，約用 3 秒慢慢讓把手回來，感覺胸口被輕輕拉開，回到把手靠近胸前的起始位置，重量片不要碰撞。',
+          '重複與結束：依目標次數重複；最後一下慢慢放回再放手，不要突然鬆手讓重量掉落。'
+        ],
+        breath: [
+          '吐氣：推出把手的時候。',
+          '吸氣：把手慢慢回來的時候。',
+          '節奏：推 1–2 秒、回 3 秒，一個動作約 4–5 秒。',
+          '避免憋氣：如果臉脹紅或頭暈，代表可能憋氣了，請減輕重量並每一下重新呼吸。'
+        ],
+        errs: [
+          ['聳肩（肩膀靠近耳朵）', '每次開始前先把肩膀往下沉，並降低重量。'],
+          ['背部離開椅背、腰部拱起', '臀部坐到底、核心輕收；若仍拱起，代表重量太重，請減重。'],
+          ['手肘張太開（呈 T 字形）', '手肘靠近身體，夾角約 45–60 度，感覺手肘朝斜後方。'],
+          ['用甩的、重量片撞擊', '減重，回程慢慢控制約 3 秒，不讓重量片碰撞。'],
+          ['手肘完全鎖死、手腕向後折', '手肘保持微彎，手腕與前臂成一直線。']
+        ],
+        avoid: [
+          '重量太重，導致腰部拱離椅背。',
+          '用扭轉身體或甩動的方式把重量推出去。',
+          '回程時讓把手猛然被拉回，肩膀前側被過度拉扯。',
+          '憋氣用力。'
+        ],
+        stop: [
+          '胸前或肩膀前側出現尖銳疼痛。',
+          '下背疼痛加劇，或出現新的下背痛。',
+          '腿部麻、刺痛、放射痛或無力：請停止訓練並尋求專業評估。',
+          '新的明顯腿部無力、會陰麻木或大小便控制異常：請立即就醫，不要繼續訓練。'
+        ],
+        back: [
+          '背部與臀部貼緊椅背可讓腰部有支撐，但並不代表一定安全。',
+          '以輕重量開始，確認腰部沒有明顯拱起或不適，再慢慢進步。',
+          'L4–L5 術後的重量、動作與頻率，請依醫師或物理治療師的個別建議；有不舒服先降低重量或停止。'
+        ],
+        angles: [
+          '側面：拍身體左側或右側，拍到頭、背部、椅背與手臂；鏡頭與胸口同高，距離約 2–3 公尺。',
+          '正面：拍到雙肩與雙手，用來看左右是否對稱。',
+          '建議拍兩張：起始位置、推到最前面的位置。'
+        ],
+        look: [
+          '背部與臀部是否貼緊椅背。',
+          '肩膀是否聳起、靠近耳朵。',
+          '手肘外張的程度與大約高度。',
+          '手腕是否與前臂成一直線。',
+          '左右兩側的高度是否明顯不一致。'
+        ],
+        limit: '照片只能觀察外觀姿勢，無法判斷肌肉發力、關節或椎間盤的狀況，不能當作醫療診斷或安全保證。單張照片或角度不足時，AI 也應明確說明無法判斷。'
+      } },
+    lat: { n: '滑輪下拉', cam: '側面，拍到頭到髖部與橫桿路徑',
+      q: '滑輪下拉 高位下拉 教學 新手', m: '背闊肌、斜方肌下部、肱二頭肌',
+      eq: '滑輪下拉機。大腿壓墊調到剛好固定大腿，不要被拉起；橫桿握距略寬於肩；先用輕重量。',
+      st: '坐穩，大腿被壓墊固定，雙手握橫桿、手臂伸直但肩膀不聳，胸口微挺，身體僅稍微後傾。',
+      sp: '握桿坐穩，核心輕收|吸氣，肩膀先往下沉|吐氣，手肘往下往後帶，橫桿拉到鎖骨或上胸附近|停 1 秒，感受夾背|吸氣，慢慢放回到手臂接近伸直（肩膀仍放鬆）|重複到目標次數',
+      br: '往下拉時吐氣，放回時吸氣。',
+      er: '聳肩；身體大幅後仰甩動；把桿拉到頸後；只用手臂拉；放回時被重量拉起。',
+      nt: '不要拉到頸後；肩膀緊繃請降低重量。',
+      bk: '請避免為了拉更重而大幅後仰或腰部拱起；保持胸口挺、腰部中立。腰痛或腿麻請立即停止。' },
+    row: { n: '坐姿划船機（胸靠墊）', cam: '側面，拍到胸口貼墊、背部與手臂',
+      q: '坐姿划船機 胸靠墊 教學', m: '背闊肌、菱形肌、後三角肌、肱二頭肌',
+      eq: '坐姿划船機（有胸靠墊）。座椅高度讓把手與胸口下緣同高；胸墊位置調到手臂伸直時胸口輕貼墊。',
+      st: '胸口貼墊，背部挺直，雙手握把手臂伸直，肩膀放鬆，雙腳踩穩踏板。',
+      sp: '胸口貼墊坐穩|吸氣，肩膀下沉|吐氣，手肘往後貼近身體，把把手拉向腹部兩側|夾緊肩胛 1 秒|吸氣，慢慢放回到手臂接近伸直|重複到目標次數',
+      br: '往後拉時吐氣，放回時吸氣。',
+      er: '身體前後晃動；聳肩；手肘抬太高；腰部拱起；重量太重。',
+      nt: '胸口全程貼墊，用背部而不是手臂拉。',
+      bk: '胸墊提供支撐，可減少腰部負擔；請勿用腰部前後擺動借力。腰痛或腿麻請立即停止。' },
+    press: { n: '坐姿啞鈴肩推（有靠背）', cam: '側面，拍到背部是否貼靠背、腰部是否反弓',
+      q: '坐姿啞鈴肩推 教學 新手', m: '三角肌、肱三頭肌、上斜方肌',
+      eq: '可調式長椅 + 輕啞鈴。椅背調到接近直立（約 80–90 度），背貼靠背；先用很輕的重量。',
+      st: '坐穩，背貼緊，雙手持啞鈴停在肩膀兩側，手肘在手腕下方，核心輕收。',
+      sp: '把啞鈴穩定放到肩旁|吐氣，向上推到手臂接近伸直，啞鈴在頭頂上方稍微靠近|停 1 秒，不鎖死手肘|吸氣，慢慢放回肩旁高度|重複到目標次數',
+      br: '往上推時吐氣，放下時吸氣。',
+      er: '腰部過度反弓、胸口頂出；聳肩；手肘鎖死；啞鈴搖晃；重量太重。',
+      nt: '保持肋骨下收，不要頂肚子；無法穩定時改機械肩推。',
+      bk: '頭上推舉最容易讓腰部反弓，請全程背貼靠背、核心收緊；若無法避免反弓，請減重或改機械肩推。腰痛或腿麻請立即停止。' },
+    face: { n: '繩索臉拉', cam: '側面，拍到頭到腳，看是否後仰',
+      q: '繩索臉拉 face pull 教學', m: '後三角肌、菱形肌、旋轉肌群',
+      eq: '滑輪機 + 雙繩把手。滑輪高度約與臉或額頭同高；選非常輕的重量。',
+      st: '雙手握繩後退一步使繩子拉緊，雙腳與肩同寬、膝蓋微彎，核心收緊，手臂前伸。',
+      sp: '站穩，肩膀放鬆|吐氣，雙手拉向臉部兩側（約眼睛或耳旁），手肘打開|停 1 秒，感受肩胛後夾|吸氣，慢慢放回|重複到目標次數',
+      br: '拉近時吐氣，放回時吸氣。',
+      er: '重量太重而身體後仰；聳肩；只用手臂；手肘垂太低。',
+      nt: '重點在肩膀後側，姿勢優先於重量。',
+      bk: '站姿請勿為了拉重量而後仰或腰部反弓，保持骨盆中立、核心收緊。腰痛或腿麻請立即停止。' },
+    birddog: { n: '鳥狗式', cam: '側面，拍到頭到腳，看背部是否平直',
+      q: '鳥狗式 Bird Dog 教學 新手', m: '核心、豎脊肌、臀大肌、肩部穩定肌',
+      eq: '瑜珈墊，不需要器材。',
+      st: '四足跪姿，雙手在肩膀正下方、膝蓋在髖部正下方，背部平直，頸部放鬆朝地板。',
+      sp: '肚子輕收，背保持平直|吐氣，緩慢伸出右手向前、左腳向後（腳伸到與背同高即可）|停 2 秒，骨盆保持水平不歪斜|吸氣，緩慢回到起始|換邊，另一側重複|每一下都要慢，不求抬高',
+      br: '伸出時吐氣，回來時吸氣。',
+      er: '腰部塌下或拱起；骨盆旋轉；腿抬太高導致腰反弓；動作太快。',
+      nt: '做不穩時，先只伸手或只伸腳。',
+      bk: '這是常見的腰部穩定入門動作，但仍不保證適合你。若抬腿使腰痠，請縮小幅度。疼痛或腿麻請立即停止。' },
+    goblet: { n: '高腳杯深蹲至箱／椅', cam: '側面，拍到全身與椅子',
+      q: '高腳杯深蹲 箱式深蹲 教學 新手', m: '股四頭肌、臀大肌、核心',
+      eq: '輕啞鈴 + 穩固椅子或長椅（高度約與膝蓋同高或略低），椅子靠牆避免滑動。',
+      st: '站姿，雙腳與肩同寬略外八，雙手抱啞鈴於胸前，背挺直，視線向前。',
+      sp: '確認椅子在身後，抱穩啞鈴|吸氣，臀部先往後坐，膝蓋朝腳尖方向彎|蹲到臀部輕觸椅面，背部保持自然挺直|吐氣，腳掌踩地用力站起|站直時夾臀，不要過度後仰|重複到目標次數',
+      br: '下蹲時吸氣，站起時吐氣。',
+      er: '膝蓋內夾；腳跟離地；圓背彎腰；蹲太深導致骨盆後捲（屁股眨眼）；上身過度前傾。',
+      nt: '蹲的深度以無痛且骨盆不後捲為準，不必硬蹲更深。',
+      bk: '負重彎腰屬於腰椎需謹慎的情況，請用輕重量。若出現骨盆後捲，請縮小深度。腰痛或腿麻請立即停止。' },
+    bridge: { n: '臀橋', cam: '側面，拍到肩、髖、膝是否連成一直線',
+      q: '臀橋 教學 新手', m: '臀大肌、腿後側、核心',
+      eq: '瑜珈墊；進階可加彈力帶。',
+      st: '仰躺，雙膝彎曲，雙腳與髖同寬踩地（腳跟距臀部約一個腳掌），雙手放身體兩側。',
+      sp: '腹部輕收，下背保持自然|吐氣，用臀部力量抬起髖部|抬到肩、髖、膝成一直線，頂端夾臀 1 秒|吸氣，慢慢放下，從上背到下背逐節落地|重複到目標次數',
+      br: '抬起時吐氣，放下時吸氣。',
+      er: '用腰部過度反弓頂高；膝蓋外開或內夾；腳離臀太遠；頸部用力。',
+      nt: '感受應在臀部，而不是下背。',
+      bk: '請不要抬到腰部過度反弓，成一直線即可；腰部酸請降低高度。腰痛或腿麻請立即停止。' },
+    curl: { n: '腿彎舉機', cam: '側面，拍到髖部是否離座與背部貼靠',
+      q: '腿彎舉機 教學 新手', m: '腿後側（膕繩肌）',
+      eq: '坐姿腿彎舉機。膝蓋對準機器轉軸；滾墊貼在腳踝上方；大腿壓墊固定；背貼椅背。',
+      st: '坐穩，背貼椅背，腿伸直，滾墊在腳踝上方，雙手握把手。',
+      sp: '確認膝蓋對準轉軸|吐氣，腳跟往臀部方向彎起|在最彎處停 1 秒|吸氣，慢慢放回到接近伸直（不鎖死）|重複到目標次數',
+      br: '彎舉時吐氣，放回時吸氣。',
+      er: '臀部離開座椅；甩動重量；身體後仰借力；放回太快。',
+      nt: '膝蓋後側不適請降低重量或停止。',
+      bk: '背部貼緊椅背，不要用腰部拱起完成動作。若使用趴姿機器，注意腰不要過度下塌，不舒服請改坐姿。腰痛或腿麻請立即停止。' },
+    ext: { n: '腿伸展機', cam: '側面，拍到背部貼椅與腿部',
+      q: '腿伸展機 教學 新手', m: '股四頭肌',
+      eq: '腿伸展機。膝蓋對準轉軸；滾墊在腳踝上方；椅背調到背部貼緊；使用輕到中等重量。',
+      st: '坐穩，背貼椅，雙手握把手，膝蓋彎約 90 度。',
+      sp: '確認膝蓋對準轉軸|吐氣，伸直小腿到接近伸直（不鎖死）|停 1 秒|吸氣，慢慢放下|重複到目標次數',
+      br: '伸直時吐氣，放下時吸氣。',
+      er: '甩動重量；膝蓋鎖死；臀部離座；重量太重。',
+      nt: '膝蓋疼痛請停止，改做低箱登階或靠牆靜蹲。',
+      bk: '背貼椅背，避免腰部拱起代償。腰痛或腿麻請立即停止。' },
+    calf: { n: '站姿小腿提踵', cam: '側面或背面，拍到全身與扶手位置',
+      q: '站姿小腿提踵 教學', m: '腓腸肌、比目魚肌',
+      eq: '平地或階梯邊緣，手扶牆或穩固物體。',
+      st: '站姿，雙腳與髖同寬，手扶穩固物，身體挺直。',
+      sp: '站穩，腹部輕收|吐氣，腳跟慢慢抬到最高|在最高處停 1 秒|吸氣，慢慢放下|重複到目標次數',
+      br: '抬起時吐氣，放下時吸氣。',
+      er: '身體前後搖晃；彈跳；只抬一點點；膝蓋鎖死。',
+      nt: '一定要手扶穩固物避免跌倒。',
+      bk: '身體保持直立，不要為了抬更高而後仰。腰痛、腿麻或小腿異常無力請立即停止。' },
+    deadbug: { n: '死蟲式', cam: '側面，拍到下背是否拱離地面',
+      q: '死蟲式 Dead Bug 教學', m: '核心（腹橫肌）、髖屈肌',
+      eq: '瑜珈墊。',
+      st: '仰躺，雙手朝天花板伸直，髖與膝彎曲 90 度（小腿與地面平行）。',
+      sp: '下背保持自然，腹部輕收|吐氣，右手向頭頂方向、左腳向前伸直（腳不碰地）|停 1 秒，確認腰部沒有拱起|吸氣，回到起始|換邊|重複到目標次數，動作要慢',
+      br: '伸出時吐氣，回來時吸氣。',
+      er: '腰部拱離地面；伸太遠；憋氣；動作太快。',
+      nt: '做不到就縮小幅度，例如先只動腳。',
+      bk: '目標是保持腰部穩定；若腰部拱起或酸痛，請縮小幅度。腰痛或腿麻請立即停止。' },
+    legpress: { n: '腿推機（限制活動範圍）', cam: '側面，拍到臀部是否離開椅面與膝蓋角度',
+      q: '腿推機 教學 新手', m: '股四頭肌、臀大肌、腿後側',
+      eq: '腿推機。座椅調到彎膝約 90 度時臀部與背仍貼緊；雙腳放踏板中間、與肩同寬；從輕重量開始。',
+      st: '坐穩，背與臀貼緊椅背，雙腳放踏板中央，解開安全把手。',
+      sp: '確認背臀貼緊、腳位正確|吸氣，慢慢彎膝降低踏板，到膝蓋約 90 度或更淺為止（臀部不離椅面）|吐氣，用整個腳掌踩推|推到接近伸直但膝蓋不鎖死|吸氣，慢慢放回|結束後鎖上安全把手',
+      br: '放下時吸氣，推出時吐氣。',
+      er: '降太深使臀部抬起、下背離椅（骨盆後捲）；膝蓋內夾；鎖死膝蓋；腳位太高或太低。',
+      nt: '深度請限制在臀部與下背仍貼緊椅背的範圍。',
+      bk: '這是腰椎需特別謹慎的動作：骨盆後捲會讓下背彎曲受力，請限制深度、使用輕重量。腰痛或腿麻請立即停止。' },
+    dbbench: { n: '啞鈴臥推（有靠背長椅）', cam: '側面，拍到背部弧度與腳位',
+      q: '啞鈴臥推 新手 教學', m: '胸大肌、三角肌前束、肱三頭肌',
+      eq: '平板長椅 + 輕啞鈴。長椅需穩固；先用輕重量。',
+      st: '躺在長椅上，雙腳踩穩地面，肩胛稍微往後夾，啞鈴在胸口上方，手腕在手肘正上方。',
+      sp: '用膝蓋輔助把啞鈴帶到胸口上方並躺穩|吸氣，慢慢放到胸口兩側（手肘約 45 度）|吐氣，把啞鈴推回胸口上方|頂端不鎖死手肘|重複到目標次數|結束後把啞鈴放回膝上再坐起',
+      br: '放下時吸氣，推起時吐氣。',
+      er: '手肘過度外開；下背大幅拱起；啞鈴晃動；肩膀前聳。',
+      nt: '初學者重量務必輕，姿勢優先。',
+      bk: '下背保持自然弧度即可，不要刻意拱高；雙腳踩穩地面。腰痛或腿麻請立即停止。' },
+    lateral: { n: '啞鈴側平舉（輕重量）', cam: '正面，拍到雙手與肩膀高度',
+      q: '啞鈴側平舉 教學 新手', m: '三角肌中束',
+      eq: '很輕的啞鈴；可坐在有靠背的椅子上做。',
+      st: '站姿或坐姿，背挺直，雙手持啞鈴於身體兩側，手肘微彎。',
+      sp: '核心輕收，肩膀放鬆|吐氣，手臂向兩側抬到肩膀高度|停 1 秒|吸氣，慢慢放下|重複到目標次數',
+      br: '抬起時吐氣，放下時吸氣。',
+      er: '甩動身體；聳肩；舉過肩膀；重量太重。',
+      nt: '輕重量即可，不要追求重量。',
+      bk: '站姿時不要後仰借力，可改坐在有靠背的椅子。腰痛或腿麻請立即停止。' },
+    reverse: { n: '反向蝴蝶機', cam: '側後方，拍到胸靠墊與肩膀手臂',
+      q: '反向蝴蝶機 reverse pec deck 新手 教學', m: '後三角肌、菱形肌、上背',
+      eq: '反向蝴蝶機。座椅高度依機型調整，胸口貼靠墊，握把約與肩同高；先用輕重量。',
+      st: '面向靠墊坐穩，胸口輕貼靠墊，雙腳踩地，雙手握把，手肘微彎。',
+      sp: '調整座椅與握把位置，胸口貼穩靠墊|吐氣，手臂向身體兩側及後方緩慢展開|保持肩膀遠離耳朵，手肘微彎，不刻意往後拉過頭|吸氣，慢慢回到起始位置|過程不甩動身體',
+      br: '向外展開吐氣，回程吸氣。',
+      er: '聳肩；腰部反弓；身體離開靠墊；重量太重導致甩動。',
+      nt: '先請現場教練確認這台機器的起始位置與座椅設定。',
+      bk: '胸部貼靠墊、腰部保持舒適中立；若腰痛或腿麻立即停止。' },
+    abduction: { n: '坐姿髖外展機', cam: '正面或斜前方，拍到背靠墊與雙膝',
+      q: '坐姿髖外展機 hip abduction machine 教學', m: '臀中肌、臀小肌',
+      eq: '坐姿髖外展機。依機器標示調整腿墊與起始角度，背與臀貼緊座椅；從輕重量開始。',
+      st: '坐穩，背臀貼緊座椅，雙腳放在腳踏位置，雙腿靠在腿墊內側。',
+      sp: '調整腿墊與起始位置，確認腰背貼靠|吐氣，雙腿向外緩慢推開至舒適角度|停留約 1 秒，不要用腰部甩動|吸氣，慢慢回到起始位置|全程維持身體穩定',
+      br: '雙腿外推吐氣，回程吸氣。',
+      er: '身體大幅前後搖晃；骨盆離座；推得過開引起不適；重量過重。',
+      nt: '不同機型腿墊位置可能不同，依現場器械標示與教練指導設定。',
+      bk: '維持背臀貼靠，不為增加角度而扭腰；若腰痛或腿麻立即停止。' },
+    plank: { n: '棒式（可跪姿）', cam: '側面，拍到頭到腳是否成一直線',
+      q: '棒式 Plank 教學 新手', m: '腹橫肌、腹直肌、肩帶穩定肌',
+      eq: '瑜珈墊；可用膝蓋支撐降低難度。',
+      st: '俯臥，前臂撐地，手肘在肩膀正下方，用腳尖（或膝蓋）撐起，身體成一直線。',
+      sp: '手肘在肩膀正下方|吐氣，抬起髖部讓身體成一直線|腹部輕收、臀部輕夾|維持 20–30 秒，正常呼吸|時間到慢慢放下',
+      br: '維持時正常呼吸，不要憋氣。',
+      er: '腰部塌下；臀部翹太高；聳肩；憋氣。',
+      nt: '腰部開始塌下就結束這一組，不要硬撐。',
+      bk: '最需要留意腰部是否塌下；若下背痠痛，請立刻結束，改做牆壁棒式或鳥狗式。腰痛或腿麻請立即停止。' }
+  };
+  // 替代動作（簡易說明）
+  const ALT = {
+    inclinepu: { n: '斜板伏地挺身', m: '胸、肩、肱三頭肌', q: '斜板伏地挺身 新手 教學', tip: '雙手撐在穩固的高處（牆邊平台或固定槓），身體成一直線，不塌腰，手撐越高越簡單。' },
+    assistpu: { n: '輔助式引體向上機', m: '背闊肌、肱二頭肌', q: '輔助引體向上機 教學', tip: '依機器設定輔助重量，胸口挺起，用背部力量往上拉，慢慢放下。' },
+    bandpd: { n: '彈力帶下拉', m: '背闊肌', q: '彈力帶下拉 教學', tip: '把彈力帶固定在高處，坐或跪姿，將帶子拉向胸口，肩膀下沉。' },
+    bentsupported: { n: '胸部支撐啞鈴划船（斜板趴姿）', m: '背闊肌、菱形肌', q: '斜板趴姿啞鈴划船 教學', tip: '胸口趴在調成斜角的長椅上，雙手持輕啞鈴往身體兩側拉，由長椅支撐身體。' },
+    bandrow: { n: '彈力帶坐姿划船', m: '背闊肌、菱形肌', q: '彈力帶坐姿划船 教學', tip: '坐地雙腿前伸（膝微彎），腰背挺直，把彈力帶拉向腹部，夾緊肩胛。' },
+    machpress: { n: '機械肩推', m: '三角肌、肱三頭肌', q: '機械肩推 教學', tip: '調整座椅使把手約在肩膀高度，背貼緊椅背，往上推起並慢慢放下。' },
+    bandface: { n: '彈力帶臉拉', m: '後三角肌、菱形肌', q: '彈力帶臉拉 教學', tip: '把彈力帶固定在與臉同高處，雙手拉向臉兩側，手肘打開。' },
+    revfly: { n: '反向飛鳥機', m: '後三角肌、上背', q: '反向飛鳥機 教學', tip: '胸口貼靠墊，雙臂向後展開，重量保持輕。' },
+    chairsq: { n: '徒手椅子深蹲', m: '股四頭肌、臀大肌', q: '徒手椅子深蹲 教學 新手', tip: '不拿重量，臀部往後坐到椅子上再站起，膝蓋朝腳尖方向。' },
+    bandbridge: { n: '彈力帶臀橋', m: '臀大肌、臀中肌', q: '彈力帶臀橋 教學', tip: '膝蓋上方套彈力帶，抬髖時膝蓋輕輕向外撐，其餘同臀橋。' },
+    hipthrust: { n: '臀推機（輕重量）', m: '臀大肌', q: '臀推機 教學 新手', tip: '依機器指示調整位置，用臀部發力推起，頂端不過度後仰腰部。' },
+    bandcurl: { n: '站姿單腳彈力帶腿後勾', m: '腿後側', q: '彈力帶腿後勾 教學', tip: '手扶穩固物，彈力帶固定在腳踝，小腿向後彎起並慢慢放回，上身保持穩定。' },
+    stepup: { n: '低箱登階', m: '股四頭肌、臀大肌', q: '低箱登階 Step Up 教學 新手', tip: '選擇低而穩的箱子，單腳踏上並站直，再慢慢放下，需要時扶牆。' },
+    wallsit: { n: '靠牆靜蹲（短時間）', m: '股四頭肌', q: '靠牆靜蹲 教學', tip: '背靠牆慢慢下滑到舒適角度，維持 15–20 秒，不要蹲太低。' },
+    seatcalf: { n: '坐姿小腿提踵機', m: '比目魚肌', q: '坐姿小腿提踵機 教學', tip: '調整墊子貼近大腿，前腳掌踩踏板，腳跟上下，重量由輕開始。' },
+    stepcalf: { n: '階梯邊緣提踵（手扶牆）', m: '腓腸肌', q: '階梯小腿提踵 教學', tip: '前腳掌踩在階梯邊緣，手扶牆，腳跟慢慢上下，注意平衡。' },
+    wallplank: { n: '牆壁棒式', m: '核心', q: '牆壁棒式 教學', tip: '前臂或雙手撐牆，身體成一直線，維持 20–30 秒，是最入門的棒式。' },
+    bandlat: { n: '彈力帶側平舉', m: '三角肌中束', q: '彈力帶側平舉 教學', tip: '踩住彈力帶中間，雙手往兩側抬到肩膀高度，慢慢放下。' },
+    machlat: { n: '機械側平舉', m: '三角肌中束', q: '機械側平舉 教學', tip: '依機器調整座椅，手肘貼墊往兩側抬起，動作慢而穩定。' }
+  };
+  const ALTBACK = '保持腰部中立、不圓背、不過度反弓，從輕重量與小幅度開始；腰部疼痛或腿麻請立即停止並尋求專業評估。';
+  const entry = k => LIB[k] || ALT[k];
+  const ex = (id, k, s, r, rest, alts) => ({ id, k, s, r, rest, alts });
+  // 正光廠 2、3 樓已由使用者確認看過的 8 種器械；不代表已通過個人醫療評估。
+  // 使用新訓練紀錄 ID，避免舊課表的替代動作、完成勾選與重量誤套到新動作。
+  const PLAN = {
+    A: { tab: 'A 上半身', title: '訓練 A｜上半身器械', ex: [
+      ex('ma1', 'chest', '2 組', '10–12 次', '60–90 秒', []),
+      ex('ma2', 'lat', '2 組', '10–12 次', '60–90 秒', []),
+      ex('ma3', 'row', '2 組', '10–12 次', '60–90 秒', []),
+      ex('ma4', 'reverse', '2 組', '10–12 次', '60–90 秒', [])
+    ] },
+    B: { tab: 'B 下半身', title: '訓練 B｜下半身器械', ex: [
+      ex('mb1', 'legpress', '2 組', '10–12 次', '60–90 秒', []),
+      ex('mb2', 'curl', '2 組', '10–12 次', '60–90 秒', []),
+      ex('mb3', 'ext', '2 組', '10–12 次', '60–90 秒', []),
+      ex('mb4', 'abduction', '2 組', '10–12 次', '60–90 秒', [])
+    ] },
+    C: { tab: 'C 爬坡有氧', title: '訓練 C｜跑步機爬坡紀錄', ex: [] }
+  };
+
+  // 有氧紀錄採用獨立的跨日儲存鍵；不影響原有飲食、喝水、體重與 A/B 訓練資料。
+  const cardioKey = 'fitlife-cardio-v1';
+  let cardioHistory = [];
+  try {
+    const stored = JSON.parse(localStorage.getItem(cardioKey) || '[]');
+    if (Array.isArray(stored)) cardioHistory = stored;
+  } catch (err) { console.log('無法讀取舊的有氧紀錄', err); }
+  function saveCardio() {
+    try { localStorage.setItem(cardioKey, JSON.stringify(cardioHistory)); }
+    catch (err) { alert('無法儲存爬坡紀錄，請確認瀏覽器儲存空間與設定。'); }
+    renderWorkout();
+  }
+  function addCardio() {
+    const date = document.getElementById('cardioDate').value;
+    const minutesText = document.getElementById('cardioMinutes').value;
+    const inclineText = document.getElementById('cardioIncline').value;
+    const speedText = document.getElementById('cardioSpeed').value;
+    const heartText = document.getElementById('cardioHeart').value;
+    const kcalText = document.getElementById('cardioKcal').value;
+    const notes = document.getElementById('cardioNotes').value.trim();
+    const minutes = Number(minutesText), incline = Number(inclineText), speed = Number(speedText);
+    const heart = heartText === '' ? null : Number(heartText);
+    const kcal = kcalText === '' ? null : Number(kcalText);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !Number.isFinite(Date.parse(date + 'T12:00:00')) ||
+        !minutesText || !inclineText || !speedText ||
+        !Number.isFinite(minutes) || minutes <= 0 || minutes > 300 ||
+        !Number.isFinite(incline) || incline < 0 || incline > 30 ||
+        !Number.isFinite(speed) || speed <= 0 || speed > 20 ||
+        (heart !== null && (!Number.isFinite(heart) || heart < 30 || heart > 250)) ||
+        (kcal !== null && (!Number.isFinite(kcal) || kcal < 0 || kcal > 5000))) {
+      alert('請填寫有效日期、時間（1–300 分鐘）、坡度（0–30%）、速度（0–20 km/h）；心率與熱量可留空。');
+      return;
+    }
+    cardioHistory.push({ id: String(Date.now()) + '-' + Math.random().toString(36).slice(2), date, minutes, incline, speed, heart, kcal, notes });
+    saveCardio();
+  }
+  function deleteCardio(id) {
+    if (!confirm('確定刪除這筆爬坡紀錄嗎？')) return;
+    cardioHistory = cardioHistory.filter(x => x.id !== id);
+    saveCardio();
+  }
+  function cardioHtml() {
+    const todayRecords = cardioHistory.filter(x => x.date === today);
+    const todayMinutes = todayRecords.reduce((sum, x) => sum + Number(x.minutes || 0), 0);
+    const day = new Date(today + 'T12:00:00');
+    const dow = (day.getDay() + 6) % 7;
+    const weekStart = new Date(day); weekStart.setDate(day.getDate() - dow);
+    const weekEnd = new Date(weekStart); weekEnd.setDate(weekStart.getDate() + 6);
+    const localDate = d => [d.getFullYear(), String(d.getMonth()+1).padStart(2,'0'), String(d.getDate()).padStart(2,'0')].join('-');
+    const weeklyMinutes = cardioHistory.filter(x => x.date >= localDate(weekStart) && x.date <= localDate(weekEnd))
+      .reduce((sum, x) => sum + Number(x.minutes || 0), 0);
+    const history = [...cardioHistory].sort((a,b) => b.date.localeCompare(a.date));
+    return `<h3>訓練 C｜跑步機爬坡有氧紀錄</h3>
+      <p class="muted">今日累積：<strong>${todayMinutes} 分鐘</strong>　｜　本週累積：<strong>${weeklyMinutes} 分鐘</strong>（週一至週日）</p>
+      <p class="warn">🛡️ L4–L5 術後請依醫師或物理治療師建議調整強度。先從舒適的低坡度與短時間開始；腰痛、腿麻、放射痛或無力時應停止並尋求專業評估。跑步機請使用安全夾。</p>
+      <div class="row">
+        <div><label for="cardioDate">📅 運動日期</label><input id="cardioDate" type="date" value="${today}"></div>
+        <div><label for="cardioMinutes">⏱️ 時間（分鐘）＊</label><input id="cardioMinutes" type="number" min="1" max="300" step="1" placeholder="例如：20"></div>
+        <div><label for="cardioIncline">⛰️ 坡度（%）＊</label><input id="cardioIncline" type="number" min="0" max="30" step="0.5" placeholder="例如：2"></div>
+        <div><label for="cardioSpeed">🚶 速度（km/h）＊</label><input id="cardioSpeed" type="number" min="0.1" max="20" step="0.1" placeholder="例如：3.5"></div>
+        <div><label for="cardioHeart">❤️ 心率（次/分，選填）</label><input id="cardioHeart" type="number" min="30" max="250" placeholder="例如：120"></div>
+        <div><label for="cardioKcal">🔥 跑步機顯示熱量（kcal，選填）</label><input id="cardioKcal" type="number" min="0" max="5000" step="1" placeholder="例如：110"></div>
+      </div>
+      <label for="cardioNotes">📝 運動感受（選填）</label>
+      <textarea id="cardioNotes" rows="3" maxlength="500" placeholder="例如：可以正常說話，沒有腰部不適" style="width:100%;padding:10px;border:1px solid #ccd8d1;border-radius:9px;font:inherit;resize:vertical"></textarea>
+      <p><button onclick="addCardio()">💾 儲存爬坡紀錄</button></p>
+      <h4>📋 歷史爬坡紀錄（${history.length} 筆）</h4>
+      ${history.length ? `<ul>${history.map(x => `<li><strong>${escapeText(x.date)}</strong>｜${Number(x.minutes)} 分鐘｜坡度 ${Number(x.incline)}%｜速度 ${Number(x.speed)} km/h${x.heart == null ? '' : '｜心率 '+Number(x.heart)}${x.kcal == null ? '' : '｜跑步機熱量 '+Number(x.kcal)+' kcal'}${x.notes ? '<br>備註：'+escapeText(x.notes) : ''} <button class="secondary" onclick="deleteCardio('${x.id}')">刪除</button></li>`).join('')}</ul>` : '<p class="muted">尚無爬坡紀錄，填寫上方資料後按儲存。</p>'}
+      <p class="muted">熱量為跑步機顯示值，僅供參考，不會加到飲食攝取熱量。紀錄保存在目前瀏覽器，不會自動同步其他裝置；清除網站資料可能使紀錄遺失。</p>`;
+  }
+  const openTips = new Set();
+  const photos = {}; // 照片只存在記憶體（blob 網址），不上傳、不寫入 localStorage
+  function toggleTip(id, isOpen) { if (isOpen) openTips.add(id); else openTips.delete(id); }
+  function wState(id) {
+    if (!data.w[id]) data.w[id] = { weight: '', sets: '', reps: '', done: false, alt: -1 };
+    return data.w[id];
+  }
+  function findEx(id) {
+    for (const d of Object.keys(PLAN)) for (const e of PLAN[d].ex) if (e.id === id) return e;
+    return null;
+  }
+  function curEntry(e) { const st = wState(e.id); return st.alt >= 0 && e.alts[st.alt] ? entry(e.alts[st.alt]) : entry(e.k); }
+  function setDay(d) { data.wDay = d; save(); }
+  function setDone(id, checked) { wState(id).done = checked; save(); }
+  function setAlt(id, val) { wState(id).alt = Number(val); save(); }
+  function setNum(id, field, el) {
+    const max = { weight: 500, sets: 20, reps: 200 }[field];
+    let v = el.value;
+    if (v !== '') {
+      const n = Number(v);
+      v = (Number.isFinite(n) && n >= 0 && n <= max) ? String(n) : '';
+    }
+    wState(id)[field] = v;
+    save();
+  }
+  function resetWorkout() {
+    if (data.wDay === 'C') {
+      if (confirm('確定刪除今天的爬坡紀錄嗎？（不影響其他日期與飲食紀錄）')) { cardioHistory = cardioHistory.filter(x => x.date !== today); saveCardio(); }
+    } else if (confirm('要清除今日 A、B 重訓紀錄嗎？（不會刪除飲食、喝水、體重或爬坡紀錄）')) { data.w = {}; save(); }
+  }
+  function videoUrl(q) { return 'https://www.youtube.com/results?search_query=' + encodeURIComponent(q); }
+
+  // 拍照／上傳（僅本頁預覽）
+  function setPhoto(id, el) {
+    const f = el.files && el.files[0];
+    if (!f) return;
+    if (!/^image\//.test(f.type)) { alert('請選擇圖片檔案。'); return; }
+    if (photos[id]) URL.revokeObjectURL(photos[id]);
+    photos[id] = URL.createObjectURL(f);
+    openTips.add('p' + id);
+    renderWorkout();
+  }
+  function clearPhoto(id) {
+    if (photos[id]) URL.revokeObjectURL(photos[id]);
+    delete photos[id];
+    renderWorkout();
+  }
+  function pickFile(inputId) { document.getElementById(inputId).click(); }
+
+  // AI 姿勢分析提示詞（由使用者自行貼到 Claude，本 APP 不會傳送任何資料）
+  function buildPrompt(e) {
+    const c = curEntry(e);
+    const checks = c.g ? c.g.look.join('\n') : (c.st ? '起始姿勢：' + c.st + '\n特別注意：' + c.nt : c.tip);
+    const errs = c.g ? c.g.errs.map(x => x[0]).join('、') : (c.er || '圓背或彎腰、腰部過度反弓、憋氣、動作過快、重量過重、關節鎖死');
+    return `請用繁體中文，以健身教練的角度分析我附上的動作照片。
+
+動作名稱：${c.n}
+建議拍攝角度：${c.cam || '側面或 45 度，盡量拍到全身'}
+
+正確姿勢檢查重點：
+${checks}
+
+常見錯誤：
+${errs}
+
+我的背景：健身初學者，目標減脂；曾接受 L4–L5 椎間盤手術，目前症狀請先向我確認，不要自行假設沒有腿麻。
+
+請注意：
+1. 只根據照片中看得到的部分描述姿勢，並指出可能需要調整的地方與具體建議。
+2. 如果單張照片、拍攝角度、光線或遮擋不足以判斷，請明確說明「無法判斷」，不要猜測；必要時請告訴我該補拍哪個角度。
+3. 請不要保證動作正確或安全，也不要做醫療診斷。
+4. 腰椎相關部分請特別保守，提醒我若出現疼痛、麻木或腿部無力，應停止並諮詢醫師或物理治療師。`;
+  }
+  function copyPrompt(id) {
+    const e = findEx(id);
+    if (!e) return;
+    const t = buildPrompt(e);
+    const ok = () => alert('已複製提示詞。請到 Claude 貼上，並一併附上照片。');
+    const fallback = () => {
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = t; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        const done = document.execCommand('copy');
+        document.body.removeChild(ta);
+        if (done) { ok(); return; }
+      } catch (err) { /* 繼續使用手動複製 */ }
+      window.prompt('無法自動複製，請手動複製以下提示詞：', t);
+    };
+    Promise.resolve().then(() => navigator.clipboard.writeText(t)).then(ok).catch(fallback);
+  }
+
+  // 動作示意圖：請把圖片放在 images/ 資料夾，檔名為「動作代碼-start.png」與「動作代碼-end.png」
+  const IMG_EXT = 'png';
+  function keyOf(e) { const st = wState(e.id); return st.alt >= 0 && e.alts[st.alt] ? e.alts[st.alt] : e.k; }
+  function figHtml(key, c) {
+    const cap = c.img || {};
+    const one = (kind, title, text) => {
+      const p = 'images/' + key + '-' + kind + '.' + IMG_EXT;
+      return `<figure><div class="imgbox"><img src="${p}" alt="${c.n}｜${title}"  onload="this.parentNode.classList.add('ok')" onerror="this.style.display='none'"><div class="ph"><strong>待加入動作示意圖</strong><span>${p}</span></div></div><figcaption><strong>${title}</strong>${text}</figcaption></figure>`;
+    };
+    return `<div class="figs">${one('start', '起始姿勢', cap.start || '請參考下方「詳細動作步驟」的第一步擺好姿勢。')}${one('end', '動作完成姿勢', cap.end || '請參考下方步驟完成動作，並留意關節位置。')}</div>`;
+  }
+  const ulH = a => `<ul>${a.map(x => `<li>${x}</li>`).join('')}</ul>`;
+  const olH = a => `<ol>${a.map(x => `<li>${x}</li>`).join('')}</ol>`;
+  // 依序：動作名稱 → 起始圖 → 完成圖 → 步驟 → 常見錯誤 → 安全注意 → 影片連結 → 上傳照片
+  function detailHtml(e, c) {
+    const g = c.g;
+    let mid, more = '';
+    if (g) {
+      mid = `<h5 class="sub">詳細動作步驟</h5>${olH(g.steps)}
+        <h5 class="sub">常見錯誤與修正</h5><ul>${g.errs.map(x => `<li><strong>${x[0]}</strong><br>修正：${x[1]}</li>`).join('')}</ul>
+        <div class="warn"><h5 class="sub">安全注意事項</h5>
+          <p><strong>要避免：</strong></p>${ulH(g.avoid)}
+          <p><strong>出現以下情況請停止訓練：</strong></p>${ulH(g.stop)}
+          <p><strong>🛡️ L4–L5 腰椎術後注意：</strong></p>${ulH(g.back)}</div>`;
+      more = `<p><strong>主要肌群：</strong>${g.muscles.main}</p><p><strong>輔助肌群：</strong>${g.muscles.assist}</p>
+        <p><strong>建議訓練量：</strong>${e.s}、${e.r}、組間休息 ${e.rest}</p>
+        <p><strong>器材與起始姿勢：</strong></p>${olH(g.setup)}
+        <p><strong>呼吸方式：</strong></p>${ulH(g.breath)}
+        <p><strong>拍照可觀察：</strong></p>${ulH(g.look)}<p class="muted">${g.limit}</p>`;
+    } else if (c.sp) {
+      mid = `<h5 class="sub">詳細動作步驟</h5>${olH(c.sp.split('|'))}
+        <h5 class="sub">常見錯誤</h5><p>${c.er}</p>
+        <div class="warn"><h5 class="sub">安全注意事項</h5><p>${c.nt}</p><p><strong>🛡️ 腰椎注意：</strong>${c.bk}</p></div>`;
+      more = `<p><strong>主要肌群：</strong>${c.m}</p><p><strong>器材與座椅調整：</strong>${c.eq}</p><p><strong>起始姿勢：</strong>${c.st}</p><p><strong>呼吸方式：</strong>${c.br}</p>`;
+    } else {
+      mid = `<h5 class="sub">動作要領</h5><p>${c.tip}</p>
+        <div class="warn"><h5 class="sub">安全注意事項</h5><p><strong>🛡️ 腰椎注意：</strong>${ALTBACK}</p></div>`;
+      more = `<p><strong>主要肌群：</strong>${c.m}</p>`;
+    }
+    const moreHtml = `<details ${openTips.has('m' + e.id) ? 'open' : ''} ontoggle="toggleTip('m${e.id}', this.open)"><summary>更多：肌群、訓練量、器材設定、呼吸</summary>${more}</details>`;
+    const video = `<h5 class="sub">教學影片</h5><a class="video" href="${videoUrl(c.q)}" target="_blank" rel="noopener noreferrer">▶ 搜尋教學影片（YouTube）</a>`;
+    return `<h4 class="dn">${c.n}</h4>${figHtml(keyOf(e), c)}${mid}${moreHtml}${video}<h5 class="sub">上傳自己的動作照片</h5>${photoHtml(e, c)}`;
+  }
+  function photoHtml(e, c) {
+    const id = e.id;
+    const img = photos[id]
+      ? `<img src="${photos[id]}" alt="動作照片預覽"><button class="secondary" onclick="clearPhoto('${id}')">🗑️ 刪除照片</button>`
+      : '<p class="muted">尚未選擇照片。</p>';
+    return `<details class="photo" ${openTips.has('p' + id) ? 'open' : ''} ontoggle="toggleTip('p${id}', this.open)">
+      <summary>📸 拍照／上傳動作照片</summary>
+      <p class="muted">建議拍攝角度：${c.cam || '側面或 45 度，盡量拍到全身'}。照片只在目前頁面預覽，不會上傳到任何伺服器，也不會儲存；重新整理頁面後就會消失。</p>
+      ${img}
+      <button onclick="pickFile('cam-${id}')">📷 拍照</button>
+      <button class="secondary" onclick="pickFile('file-${id}')">🖼️ ${photos[id] ? '重新選擇' : '選擇圖片'}</button>
+      <input type="file" id="cam-${id}" accept="image/*" capture="environment" onchange="setPhoto('${id}', this)">
+      <input type="file" id="file-${id}" accept="image/*" onchange="setPhoto('${id}', this)">
+      <div><button onclick="copyPrompt('${id}')">📋 複製 AI 姿勢分析提示詞</button></div>
+      <p class="muted">複製後請自行貼到 Claude，並附上照片。AI 分析僅供參考，不能保證動作正確或安全；照片不足以判斷時，應直接說明無法判斷。</p>
+    </details>`;
+  }
+  function exHtml(e) {
+    const st = wState(e.id);
+    const base = entry(e.k);
+    const c = curEntry(e);
+    const alt = false;
+
+    return `<div class="ex ${st.done ? 'done' : ''}">
+      <h3>${c.n}${alt ? ' <span class="muted">（替代 ' + base.n + '）</span>' : ''}</h3>
+      <div class="tags"><span class="tag">${e.s}</span><span class="tag">${e.r}</span><span class="tag">休息 ${e.rest}</span><span class="tag">肌群：${c.m}</span></div>
+      <details ${openTips.has('d' + e.id) ? 'open' : ''} ontoggle="toggleTip('d${e.id}', this.open)">
+        <summary>新手教學</summary>
+        ${detailHtml(e, c)}
+      </details>
+
+      <div class="row">
+        <div><label>重量（kg）</label><input type="number" min="0" max="500" step="0.5" value="${st.weight}" onchange="setNum('${e.id}','weight',this)"></div>
+        <div><label>完成組數</label><input type="number" min="0" max="20" step="1" value="${st.sets}" onchange="setNum('${e.id}','sets',this)"></div>
+        <div><label>每組完成次數</label><input type="number" min="0" max="200" step="1" value="${st.reps}" onchange="setNum('${e.id}','reps',this)"></div>
+      </div>
+      <label class="check"><input type="checkbox" ${st.done ? 'checked' : ''} onchange="setDone('${e.id}', this.checked)">完成此動作</label>
+    </div>`;
+  }
+  function renderWorkout() {
+    if (!PLAN[data.wDay]) data.wDay = 'A';
+    const p = PLAN[data.wDay];
+    if (data.wDay === 'C') {
+      document.getElementById('dayTabs').innerHTML = Object.keys(PLAN).map(k =>
+        `<button class="${k === data.wDay ? '' : 'secondary'}" onclick="setDay('${k}')">${PLAN[k].tab}</button>`).join('');
+      document.getElementById('workoutBody').innerHTML = cardioHtml();
+      return;
+    }
+    const done = p.ex.filter(e => wState(e.id).done).length;
+    document.getElementById('dayTabs').innerHTML = Object.keys(PLAN).map(k =>
+      `<button class="${k === data.wDay ? '' : 'secondary'}" onclick="setDay('${k}')">${PLAN[k].tab}</button>`).join('');
+    document.getElementById('workoutBody').innerHTML =
+      `<h3>${p.title}</h3>
+       <p class="muted">先熱身 5–10 分鐘。已完成 ${done} / ${p.ex.length} 個動作</p>
+       <p class="warn muted">若出現疼痛或神經症狀，請停止訓練並尋求專業評估；出現新的明顯腿部無力、會陰麻木或大小便控制異常，請立即就醫。</p>
+       <div class="bar"><div style="width:${Math.round(done / p.ex.length * 100)}%"></div></div>` +
+      p.ex.map(exHtml).join('');
+  }
+  // ===== FitLife AI 備份與還原（僅處理本 APP 的 localStorage 鍵） =====
+  const FITLIFE_BACKUP_VERSION = 1;
+  const fitlifeStorageKey = k => /^fitlife-\d{4}-\d{2}-\d{2}$/.test(k) || k === 'fitlife-cardio-v1' || k === 'fitlife-weight-goals-v1';
+  function exportFitlifeBackup() {
+    try {
+      const records = {};
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (fitlifeStorageKey(k)) {
+          const raw = localStorage.getItem(k);
+          // 不把無法解析的損壞資料誤當有效備份。
+          JSON.parse(raw);
+          records[k] = raw;
+        }
+      }
+      const backup = { app: 'FitLife AI', version: FITLIFE_BACKUP_VERSION,
+        exportedAt: new Date().toISOString(), records };
+      const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'FitLife_AI_備份_' + statsLocalDate(new Date()) + '.json';
+      document.body.appendChild(a);
+      a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1500);
+      alert('已建立備份下載（共 ' + Object.keys(records).length + ' 個資料項目）。請確認瀏覽器下載資料夾中有 JSON 檔。');
+    } catch (err) { alert('無法匯出備份：' + err.message); }
+  }
+  async function importFitlifeBackup() {
+    const input = document.getElementById('fitlifeBackupFile');
+    const file = input.files && input.files[0];
+    if (!file) { alert('請先選擇 JSON 備份檔。'); return; }
+    if (file.size > 5 * 1024 * 1024) { alert('備份檔超過 5 MB，請檢查檔案。'); return; }
+    let parsed, entries;
+    try {
+      parsed = JSON.parse(await file.text());
+      if (!parsed || parsed.app !== 'FitLife AI' || parsed.version !== FITLIFE_BACKUP_VERSION ||
+          !parsed.records || typeof parsed.records !== 'object' || Array.isArray(parsed.records)) {
+        throw new Error('不是支援的 FitLife AI 備份格式');
+      }
+      entries = Object.entries(parsed.records);
+      if (entries.length > 10000 || !entries.every(([k,v]) => fitlifeStorageKey(k) && typeof v === 'string')) {
+        throw new Error('備份內容包含無效資料項目');
+      }
+      for (const [k, raw] of entries) {
+        const obj = JSON.parse(raw);
+        if (k === 'fitlife-weight-goals-v1') {
+          if (!obj || typeof obj !== 'object' || Array.isArray(obj) ||
+              (obj.height !== null && (!Number.isFinite(obj.height) || obj.height < 100 || obj.height > 250)) ||
+              (obj.target !== null && (!Number.isFinite(obj.target) || obj.target <= 0 || obj.target > 500)))
+            throw new Error('體重目標設定格式不正確');
+        } else if (k === 'fitlife-cardio-v1') {
+          if (!Array.isArray(obj) || !obj.every(x => x && typeof x === 'object' &&
+              typeof x.id === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(x.date) &&
+              Number.isFinite(Number(x.minutes)) && Number(x.minutes) > 0))
+            throw new Error('爬坡紀錄格式不正確');
+        } else {
+          if (!obj || typeof obj !== 'object' || Array.isArray(obj) ||
+              !Array.isArray(obj.foods) || !Array.isArray(obj.weights) ||
+              !Number.isFinite(Number(obj.water)) ||
+              !obj.w || typeof obj.w !== 'object' || Array.isArray(obj.w))
+            throw new Error('每日紀錄格式不正確：' + k);
+        }
+      }
+    } catch (err) { alert('無法還原：' + err.message); input.value = ''; return; }
+    const oldKeys = [];
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (fitlifeStorageKey(k)) oldKeys.push(k);
+      }
+    } catch (err) { alert('無法讀取現有資料：' + err.message); return; }
+    const msg = '備份建立時間：' + (parsed.exportedAt || '未知') + '\n' +
+      '備份包含 ' + entries.filter(([k]) => /^fitlife-\d{4}-\d{2}-\d{2}$/.test(k)).length + ' 天每日紀錄，' +
+      (entries.some(([k]) => k === 'fitlife-cardio-v1') ? '含 C 爬坡歷史紀錄' : '不含 C 爬坡歷史紀錄') + '。\n\n' +
+      '將用備份內容取代此瀏覽器目前的 FitLife AI 紀錄（共 ' + oldKeys.length + ' 個資料項目）。' +
+      '\n備份沒有的日期也會從此瀏覽器移除。\n建議先匯出現有資料。確定繼續？';
+    if (!confirm(msg)) { input.value = ''; return; }
+    if (!confirm('最後確認：確定覆蓋目前 FitLife AI 紀錄嗎？此操作無法直接復原。')) {
+      input.value = ''; return;
+    }
+    // 若容量不足或寫入失敗，嘗試回復匯入前狀態。
+    const previous = {};
+    for (const k of oldKeys) previous[k] = localStorage.getItem(k);
+    try {
+      oldKeys.forEach(k => localStorage.removeItem(k));
+      entries.forEach(([k,v]) => localStorage.setItem(k,v));
+    } catch (err) {
+      try {
+        const currentKeys = [];
+        for (let i=0;i<localStorage.length;i++) {
+          const k=localStorage.key(i); if (fitlifeStorageKey(k)) currentKeys.push(k);
+        }
+        currentKeys.forEach(k => localStorage.removeItem(k));
+        Object.entries(previous).forEach(([k,v]) => localStorage.setItem(k,v));
+        alert('還原失敗，已嘗試恢復原有資料：' + err.message);
+      } catch (rollbackErr) {
+        alert('還原與回復原資料都失敗！請勿關閉備份檔，並檢查瀏覽器儲存空間。');
+      }
+      return;
+    }
+    alert('還原完成！頁面即將重新整理，載入備份紀錄。');
+    location.reload();
+  }
+
+  // ===== 歷史紀錄查詢（唯讀；不寫入 localStorage） =====
+  function renderHistory() {
+    const field = document.getElementById('historyDate');
+    const result = document.getElementById('historyResult');
+    if (!field || !result) return;
+    const date = field.value;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date) ||
+        !Number.isFinite(new Date(date + 'T12:00:00').getTime()) ||
+        statsLocalDate(new Date(date + 'T12:00:00')) !== date) {
+      result.textContent = '請選擇有效日期。';
+      return;
+    }
+    let day = null;
+    try {
+      const raw = localStorage.getItem('fitlife-' + date);
+      if (raw !== null) {
+        const parsed = JSON.parse(raw);
+        if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error('格式錯誤');
+        day = parsed;
+      }
+    } catch (err) {
+      result.textContent = '無法讀取這一天的紀錄，請確認備份與瀏覽器資料。';
+      return;
+    }
+    const esc = value => escapeText(String(value ?? ''));
+    const foods = day && Array.isArray(day.foods) ? day.foods : [];
+    const weights = day && Array.isArray(day.weights) ? day.weights : [];
+    const water = day && Number.isFinite(Number(day.water)) ? Number(day.water) : 0;
+    const states = day && day.w && typeof day.w === 'object' && !Array.isArray(day.w) ? day.w : {};
+    const cardio = cardioHistory.filter(x => x && x.date === date);
+    if (!day && !cardio.length) {
+      result.innerHTML = '<p class="muted">這一天沒有已儲存的紀錄。</p>';
+      return;
+    }
+    const sum = field => foods.reduce((total, f) => {
+      const n = Number(f && f[field]);
+      return total + (Number.isFinite(n) ? n : 0);
+    }, 0);
+    const numberText = n => Math.round(n * 10) / 10;
+    const foodHtml = foods.length ? '<ul>' + foods.map(f =>
+      `<li>${esc(f.name)}：${esc(f.calories)} kcal、蛋白質 ${esc(f.protein)} g</li>`).join('') + '</ul>' : '<p class="muted">無飲食紀錄</p>';
+    const weightHtml = weights.length ? '<ul>' + weights.map(w =>
+      `<li>${esc(w.date || date)}：${esc(w.weight)} kg</li>`).join('') + '</ul>' : '<p class="muted">無體重紀錄</p>';
+    const workoutHtml = ['A', 'B'].map(k => {
+      const exercises = PLAN[k].ex.map(e => ({ e, s: states[e.id] })).filter(x => x.s && x.s.done === true);
+      return `<h4>${esc(PLAN[k].tab)}（已完成 ${exercises.length} 個動作）</h4>` +
+        (exercises.length ? '<ul>' + exercises.map(({e,s}) =>
+          `<li>${esc(entry(e.k).n)}｜重量：${esc(s.weight || '未填')}｜組數：${esc(s.sets || '未填')}｜次數：${esc(s.reps || '未填')}</li>`
+        ).join('') + '</ul>' : '<p class="muted">無已完成動作</p>');
+    }).join('');
+    const minutes = cardio.reduce((total, x) => total + (Number(x.minutes) || 0), 0);
+    const cardioHtmlHistory = cardio.length ? '<ul>' + cardio.map(x =>
+      `<li>${esc(x.minutes)} 分鐘｜坡度 ${esc(x.incline)}%｜速度 ${esc(x.speed)} km/h｜心率 ${esc(x.heart ?? '未填')}｜跑步機熱量 ${esc(x.kcal ?? '未填')} kcal${x.notes ? '｜備註：' + esc(x.notes) : ''}</li>`
+    ).join('') + '</ul>' : '<p class="muted">無爬坡有氧紀錄</p>';
+    result.innerHTML = `
+      <div class="ex"><h3>📋 ${esc(date)} 每日摘要</h3>
+      <p>🔥 熱量：<strong>${numberText(sum('calories'))} kcal</strong>　🥚 蛋白質：<strong>${numberText(sum('protein'))} g</strong></p>
+      <p>💧 喝水：<strong>${esc(water)} ml</strong>　🚶 爬坡：<strong>${numberText(minutes)} 分鐘</strong></p></div>
+      <div class="ex"><h3>🍱 飲食明細</h3>${foodHtml}</div>
+      <div class="ex"><h3>⚖️ 體重紀錄</h3>${weightHtml}</div>
+      <div class="ex"><h3>🏋️ A／B 訓練紀錄</h3>${workoutHtml}</div>
+      <div class="ex"><h3>🚶 C 爬坡有氧紀錄</h3>${cardioHtmlHistory}</div>`;
+  }
+  document.getElementById('historyDate').value = today;
+  renderHistory();
+
+  // ===== 健身統計：讀取既有每日 A/B 與跨日 C 紀錄，不改動原資料 =====
+  function statsLocalDate(d) {
+    return [d.getFullYear(), String(d.getMonth()+1).padStart(2,'0'), String(d.getDate()).padStart(2,'0')].join('-');
+  }
+  function statsMonday(d) {
+    const copy = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 12);
+    copy.setDate(copy.getDate() - (copy.getDay() + 6) % 7);
+    return copy;
+  }
+  function getWorkoutStats() {
+    const byDate = {};
+    // 舊資料依日期分開存放於 fitlife-YYYY-MM-DD。
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const storageKey = localStorage.key(i);
+        if (!/^fitlife-\d{4}-\d{2}-\d{2}$/.test(storageKey)) continue;
+        const date = storageKey.slice(8);
+        const dayData = JSON.parse(localStorage.getItem(storageKey) || '{}');
+        const states = dayData && dayData.w && typeof dayData.w === 'object' ? dayData.w : {};
+        const a = PLAN.A.ex.some(e => states[e.id] && states[e.id].done === true);
+        const b = PLAN.B.ex.some(e => states[e.id] && states[e.id].done === true);
+        if (a || b) byDate[date] = { a, b, cardio: 0 };
+      }
+    } catch (err) { console.log('部分歷史訓練紀錄無法讀取', err); }
+    cardioHistory.forEach(x => {
+      if (!x || !/^\d{4}-\d{2}-\d{2}$/.test(x.date)) return;
+      if (!byDate[x.date]) byDate[x.date] = { a: false, b: false, cardio: 0 };
+      const minutes = Number(x.minutes);
+      if (Number.isFinite(minutes) && minutes > 0) byDate[x.date].cardio += minutes;
+    });
+    return byDate;
+  }
+  function renderStats() {
+    const cards = document.getElementById('statsCards');
+    const chart = document.getElementById('statsChart');
+    if (!cards || !chart) return;
+    const records = getWorkoutStats();
+    const now = new Date();
+    const monday = statsMonday(now);
+    const weeks = [];
+    for (let i = 3; i >= 0; i--) {
+      const start = new Date(monday);
+      start.setDate(monday.getDate() - i * 7);
+      const end = new Date(start);
+      end.setDate(start.getDate() + 6);
+      const startKey = statsLocalDate(start), endKey = statsLocalDate(end);
+      const entries = Object.entries(records).filter(([date]) => date >= startKey && date <= endKey);
+      const a = entries.filter(([,v]) => v.a).length;
+      const b = entries.filter(([,v]) => v.b).length;
+      const cardio = Math.round(entries.reduce((sum,[,v]) => sum + v.cardio, 0) * 10) / 10;
+      const days = entries.filter(([,v]) => v.a || v.b || v.cardio > 0).length;
+      weeks.push({ startKey, endKey, a, b, cardio, days });
+    }
+    const current = weeks[3];
+    const stats = [
+      ['🏋️ A 上半身', current.a + ' 次'],
+      ['🦵 B 下半身', current.b + ' 次'],
+      ['🚶 C 爬坡有氧', current.cardio + ' 分鐘'],
+      ['📅 本週運動天數', current.days + ' / 3 天']
+    ];
+    cards.innerHTML = stats.map(([label,value]) => `<div style="border:1px solid #E7D9C8;border-radius:12px;padding:12px"><div class="muted">${label}</div><div class="number" style="font-size:22px">${value}</div></div>`).join('');
+    const maxDays = Math.max(3, ...weeks.map(w => w.days));
+    chart.innerHTML = weeks.map((w,i) => {
+      const percent = Math.round(w.days / maxDays * 100);
+      return `<div style="margin:14px 0"><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><strong>${w.startKey.slice(5)}～${w.endKey.slice(5)}${i===3?'（本週）':''}</strong><span>${w.days} 天／A ${w.a} 次／B ${w.b} 次／C ${w.cardio} 分鐘</span></div><div class="bar" style="height:15px"><div style="width:${percent}%"></div></div></div>`;
+    }).join('') + `<p class="muted">本週達成率：${Math.min(100,Math.round(current.days/3*100))}%（${current.days >= 3 ? '已達成' : '尚差 '+(3-current.days)+' 天'}）。超過 3 天仍會顯示實際天數。</p>`;
+  }
+  // 使用者切換訓練、勾選動作或新增／刪除 C 紀錄時，自動更新統計。
+  const originalRenderWorkout = renderWorkout;
+  renderWorkout = function () { originalRenderWorkout(); renderStats(); };
+
+  // ===== 體重趨勢：只讀取既有 fitlife-YYYY-MM-DD 記錄 =====
+  const weightGoalsKey = 'fitlife-weight-goals-v1';
+  function readWeightGoals() {
+    try {
+      const value = JSON.parse(localStorage.getItem(weightGoalsKey) || '{}');
+      return value && typeof value === 'object' ? value : {};
+    } catch (e) { return {}; }
+  }
+  function saveWeightGoals() {
+    const heightText = document.getElementById('heightCm').value.trim();
+    const targetText = document.getElementById('targetWeight').value.trim();
+    const height = heightText ? Number(heightText) : null;
+    const target = targetText ? Number(targetText) : null;
+    if ((height !== null && (!Number.isFinite(height) || height < 100 || height > 250)) ||
+        (target !== null && (!Number.isFinite(target) || target <= 0 || target > 500))) {
+      alert('身高請輸入 100–250 公分，目標體重請輸入 1–500 kg，或留空。');
+      return;
+    }
+    try { localStorage.setItem(weightGoalsKey, JSON.stringify({height, target})); }
+    catch (e) { alert('設定儲存失敗：' + e.message); return; }
+    renderWeightTrend();
+    alert('身高與目標體重已儲存。');
+  }
+  function getWeightHistory() {
+    const perDay = new Map();
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (!/^fitlife-\d{4}-\d{2}-\d{2}$/.test(k)) continue;
+        const day = k.slice(8);
+        const record = JSON.parse(localStorage.getItem(k) || '{}');
+        if (!record || !Array.isArray(record.weights)) continue;
+        for (const entry of record.weights) {
+          const n = Number(entry && entry.weight);
+          const d = entry && /^\d{4}-\d{2}-\d{2}$/.test(entry.date) ? entry.date : day;
+          if (Number.isFinite(n) && n > 0 && n <= 500 && d <= today) {
+            const previous = perDay.get(d);
+            // 每日記錄依原始寫入順序，當日最後一筆覆蓋前一筆。
+            if (!previous || day > previous.source || day === previous.source)
+              perDay.set(d, {date:d, weight:n, source:day});
+          }
+        }
+      }
+    } catch (e) { console.log('讀取部分體重紀錄失敗', e); }
+    return [...perDay.values()].sort((a,b) => a.date.localeCompare(b.date));
+  }
+  function renderWeightTrend() {
+    const cards = document.getElementById('weightTrendCards');
+    const chart = document.getElementById('weightTrendChart');
+    const info = document.getElementById('weightGoalInfo');
+    if (!cards || !chart || !info) return;
+    const all = getWeightHistory();
+    const range = document.getElementById('weightRange').value;
+    let start = '';
+    if (range !== 'all') {
+      const d = new Date(today + 'T12:00:00');
+      d.setDate(d.getDate() - Number(range) + 1);
+      start = statsLocalDate(d);
+    }
+    const shown = all.filter(x => !start || x.date >= start);
+    const goals = readWeightGoals();
+    const height = Number(goals.height), target = Number(goals.target);
+    const validHeight = goals.height != null && Number.isFinite(height) && height >= 100 && height <= 250;
+    const validTarget = goals.target != null && Number.isFinite(target) && target > 0 && target <= 500;
+    const last = shown[shown.length - 1], first = shown[0];
+    const newest = all[all.length - 1];
+    const fmt = n => (Math.round(n * 10) / 10).toFixed(1);
+    const change = shown.length >= 2 ? last.weight - first.weight : null;
+    const fields = [
+      ['⚖️ 期間最新體重', last ? fmt(last.weight) + ' kg' : '無紀錄'],
+      ['📉 期間體重變化', change === null ? '需要至少 2 天紀錄' : (change > 0 ? '+' : '') + fmt(change) + ' kg'],
+      ['📅 有紀錄天數', shown.length + ' 天'],
+      ['🎯 目標體重', validTarget ? fmt(target) + ' kg' : '尚未設定']
+    ];
+    cards.innerHTML = fields.map(([label,value]) => `<div style="border:1px solid #E7D9C8;border-radius:12px;padding:12px"><div class="muted">${label}</div><div style="font-weight:700;font-size:19px;color:#8B5E42">${value}</div></div>`).join('');
+    if (!shown.length) {
+      chart.innerHTML = '<p class="muted">所選期間沒有體重紀錄。可在上方「⚖️ 體重紀錄」新增，或切換較長期間。</p>';
+    } else {
+      const width = 700, heightSvg = 290, left = 60, right = 22, top = 20, bottom = 55;
+      const w = width-left-right, h = heightSvg-top-bottom;
+      const vals = shown.map(x => x.weight);
+      let min = Math.min(...vals), max = Math.max(...vals);
+      const padding = Math.max(1, (max-min)*0.2);
+      min -= padding; max += padding;
+      const from = new Date(shown[0].date + 'T12:00:00').getTime();
+      const to = new Date(shown[shown.length-1].date + 'T12:00:00').getTime();
+      const xPos = d => to === from ? left + w/2 : left + (new Date(d+'T12:00:00').getTime()-from)/(to-from)*w;
+      const yPos = v => top + (max-v)/(max-min)*h;
+      const points = shown.map(x => `${xPos(x.date).toFixed(1)},${yPos(x.weight).toFixed(1)}`).join(' ');
+      const grid = Array.from({length:5}, (_,i) => {
+        const val = min+(max-min)*i/4, y=yPos(val);
+        return `<line x1="${left}" y1="${y}" x2="${width-right}" y2="${y}" stroke="#E7D9C8"/><text x="${left-8}" y="${y+4}" font-size="12" text-anchor="end" fill="#79695D">${fmt(val)}</text>`;
+      }).join('');
+      const dots = shown.map(x => `<circle cx="${xPos(x.date)}" cy="${yPos(x.weight)}" r="4.5" fill="#8B5E42"><title>${x.date}：${fmt(x.weight)} kg</title></circle>`).join('');
+      const xLabels = shown.length === 1 ? [shown[0]] : [shown[0], shown[Math.floor((shown.length-1)/2)], shown[shown.length-1]];
+      const labels = xLabels.map(x => `<text x="${xPos(x.date)}" y="${heightSvg-21}" font-size="12" text-anchor="middle" fill="#79695D">${x.date.slice(5)}</text>`).join('');
+      chart.innerHTML = `<svg viewBox="0 0 ${width} ${heightSvg}" role="img" aria-label="體重趨勢折線圖，${shown.length} 天紀錄" style="display:block;width:100%;min-width:320px;max-width:700px">${grid}${shown.length > 1 ? `<polyline points="${points}" fill="none" stroke="#8B5E42" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>` : ''}${dots}${labels}</svg><p class="muted">圖表僅連接有紀錄的日期，沒有量測的日子不代表體重不變。</p>`;
+    }
+    const bmi = validHeight && newest ? newest.weight / Math.pow(height/100, 2) : null;
+    const remaining = validTarget && newest ? newest.weight - target : null;
+    info.textContent = `最新一次量測：${newest ? newest.date + '（' + fmt(newest.weight) + ' kg）' : '尚無紀錄'}。` +
+      `　BMI：${bmi === null ? '請設定身高並記錄體重' : fmt(bmi)}。` +
+      `　距離目標：${remaining === null ? '請設定目標並記錄體重' : (remaining > 0 ? '尚差 ' + fmt(remaining) + ' kg' : remaining < 0 ? '已低於目標 ' + fmt(-remaining) + ' kg' : '已達目標')}。BMI 僅供參考，不能單獨判斷健康或體脂。`;
+  }
+  const initialWeightGoals = readWeightGoals();
+  document.getElementById('heightCm').value = initialWeightGoals.height ?? '';
+  document.getElementById('targetWeight').value = initialWeightGoals.target ?? '';
+  const oldSaveForWeightTrend = save;
+  save = function () { oldSaveForWeightTrend(); renderWeightTrend(); };
+  renderWeightTrend();
+
+  renderStats();
+  render();
+
+  /* Relocate existing live elements into phone tabs without replacing the app logic. */
+  (function setupPhoneUI(){
+    const main=document.querySelector('main');
+    const originalGrid=main.querySelector(':scope > .grid');
+    if(!originalGrid) return;
+    const sections={};
+    const headings={home:['🏠 今日總覽','你的健康紀錄一眼掌握'],food:['📸 飲食紀錄','拍照、記錄食物及查看營養'],recommend:['🥗 飲食推薦','每日菜單與下一餐建議'],workout:['🏋️ 健身訓練','A／B／C 三天訓練計畫'],mine:['📊 我的數據','體重、歷史、統計與備份']};
+    for(const [id,pair] of Object.entries(headings)){
+      const panel=document.createElement('div');panel.dataset.fitPanel=id;panel.id='fit-panel-'+id;
+      const heading=document.createElement('div');heading.className='fit-panel-heading';
+      const h=document.createElement('h2');h.textContent=pair[0];const p=document.createElement('p');p.textContent=pair[1];
+      heading.append(h,p);panel.appendChild(heading);main.appendChild(panel);sections[id]=panel;
+    }
+    const calorieCard=originalGrid.children[0],waterCard=originalGrid.children[1],proteinCard=originalGrid.children[2],weightCard=originalGrid.children[3];
+    const homeGrid=document.createElement('div');homeGrid.className='grid';
+    homeGrid.append(waterCard,proteinCard,weightCard);sections.home.appendChild(homeGrid);
+    const quick=document.createElement('div');quick.className='fit-quick';
+    quick.innerHTML='<button type="button" onclick="switchFitTab(\'food\')">📷 記錄飲食</button><button type="button" class="secondary" onclick="switchFitTab(\'recommend\')">🥗 今日吃什麼</button>';
+    sections.home.insertBefore(quick,homeGrid);
+    sections.food.appendChild(calorieCard);
+    const photo=document.createElement('section');photo.className='card';
+    photo.innerHTML='<h2>📸 食物照片</h2><p class="fit-note">可用手機相機拍照或從相簿挑選。此階段僅預覽照片，尚未啟用 AI 自動辨識或儲存照片。</p><label for="fitFoodPhoto">選擇食物照片</label><input id="fitFoodPhoto" type="file" accept="image/*" capture="environment"><img id="fitPhotoPreview" alt="你選擇的食物照片" style="display:none;max-width:100%;max-height:280px;border-radius:12px;margin-top:10px"><p id="fitPhotoHint" class="fit-note"></p>';
+    sections.food.insertBefore(photo,calorieCard);
+    const pInput=photo.querySelector('input');let imageURL=null;
+    pInput.addEventListener('change',function(){
+      const f=this.files&&this.files[0];const img=document.getElementById('fitPhotoPreview'),hint=document.getElementById('fitPhotoHint');
+      if(imageURL){URL.revokeObjectURL(imageURL);imageURL=null;}
+      if(!f){img.style.display='none';hint.textContent='';return;}
+      if(!f.type.startsWith('image/')){this.value='';img.style.display='none';hint.textContent='請選擇圖片檔案。';return;}
+      imageURL=URL.createObjectURL(f);img.src=imageURL;img.style.display='block';hint.textContent='照片已選擇。目前請在下方手動輸入食物名稱、熱量及蛋白質；AI 辨識將在確認免費安全方案後接入。';
+    });
+    const recommend=document.createElement('section');recommend.className='card';
+    recommend.innerHTML='<h2>🥗 每日飲食推薦</h2><div class="fit-placeholder"><strong>下一階段開發</strong><p>將新增「今天吃什麼」、「下一餐推薦」與「冰箱現有食材」三種模式，搭配熱量及蛋白質目標。</p><p class="fit-note">目前尚未提供 AI 推薦或自動營養估算；此區不是已生成的個人化菜單。</p></div>';
+    sections.recommend.appendChild(recommend);
+    const all=[...main.children];
+    for(const node of all){
+      if(node===originalGrid||node.dataset.fitPanel!==undefined||node.tagName==='SCRIPT')continue;
+      if(node.matches('#weightTrendSection,#historySection,#backupSection,#statsSection'))sections.mine.appendChild(node);
+      else if(node.matches('.card'))sections.workout.appendChild(node);
+      else if(node.tagName==='P')sections.mine.appendChild(node);
+    }
+    originalGrid.remove();
+    const bottom=document.createElement('nav');bottom.className='fit-tabs';bottom.setAttribute('aria-label','主要功能');
+    const entries=[['home','🏠','首頁'],['food','📸','飲食'],['recommend','🥗','推薦'],['workout','🏋️','健身'],['mine','📊','我的']];
+    for(const [id,icon,label] of entries){const b=document.createElement('button');b.className='bottom-tab';b.type='button';b.setAttribute('aria-label',label);b.dataset.tab=id;b.innerHTML='<span class="tab-icon">'+icon+'</span><span>'+label+'</span>';b.addEventListener('click',()=>switchFitTab(id));bottom.appendChild(b);}
+    document.body.appendChild(bottom);
+    window.switchFitTab=function(id){if(!sections[id])return;Object.entries(sections).forEach(([name,p])=>p.classList.toggle('active',name===id));bottom.querySelectorAll('button').forEach(b=>{const active=b.dataset.tab===id;b.classList.toggle('active',active);b.setAttribute('aria-current',active?'page':'false');});window.scrollTo(0,0);};
+    switchFitTab('home');
+  })();
+
+</script>
+</body>
+</html>
