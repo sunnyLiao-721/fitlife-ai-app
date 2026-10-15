@@ -239,6 +239,12 @@
     <p class="muted">還原前會先驗證檔案、顯示筆數並要求確認。還原將覆蓋此瀏覽器中備份涵蓋的 FitLife AI 紀錄；不會修改圖片資料夾。建議先匯出現有紀錄備份。</p>
   </section>
 
+  <section class="card" id="weeklyNutritionSection">
+    <h2>📊 最近 7 天營養與喝水趨勢</h2>
+    <p class="muted">只讀取這台裝置已儲存的每日紀錄；未記錄的日期顯示「無紀錄」，不視為攝取 0。目標為目前設定值，僅供參考。</p>
+    <div id="weeklyNutritionCharts"></div>
+  </section>
+
   <section class="card" id="statsSection">
     <h2>📊 健身進度統計</h2>
     <p class="muted">以週一至週日為一週；每週目標為運動 3 天。A／B 只要當天至少勾選一個完成動作，就計入該課表一次；同一天多筆 C 爬坡合計為一個運動日。</p>
@@ -1369,6 +1375,68 @@ ${errs}
   renderStats();
   render();
 
+  // 最近 7 天營養／喝水：沿用每日 fitlife-YYYY-MM-DD 資料，不覆寫既有紀錄。
+  function renderWeeklyNutritionCharts() {
+    const root = document.getElementById('weeklyNutritionCharts');
+    if (!root) return;
+    const goals = nutritionGoals();
+    const waterGoal = getWaterGoal();
+    const rows = [];
+    for (let offset = 6; offset >= 0; offset--) {
+      const d = new Date(); d.setHours(12, 0, 0, 0); d.setDate(d.getDate() - offset);
+      const date = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+      let record = null;
+      try {
+        const raw = localStorage.getItem('fitlife-' + date);
+        if (raw !== null) {
+          const parsed = JSON.parse(raw);
+          if (parsed && typeof parsed === 'object') record = parsed;
+        }
+      } catch (e) { /* 跳過無法讀取的日期 */ }
+      if (date === today) record = data;
+      const foods = record && Array.isArray(record.foods) ? record.foods : [];
+      const sum = field => foods.reduce((total, f) => {
+        const n = Number(f && f[field]);
+        return total + (Number.isFinite(n) && n >= 0 ? n : 0);
+      }, 0);
+      rows.push({date, hasRecord: !!record, calories: sum('calories'), protein: sum('protein'), water: record ? Math.max(0, Number(record.water) || 0) : 0});
+    }
+    root.replaceChildren();
+    const metrics = [
+      {title:'🔥 每日熱量', field:'calories', unit:'kcal', goal:goals && goals.calories},
+      {title:'🥚 每日蛋白質', field:'protein', unit:'g', goal:goals && goals.protein},
+      {title:'💧 每日喝水', field:'water', unit:'ml', goal:waterGoal}
+    ];
+    for (const metric of metrics) {
+      const section = document.createElement('section');
+      section.style.margin = '18px 0 24px';
+      const title = document.createElement('h3'); title.textContent = metric.title;
+      const subtitle = document.createElement('p'); subtitle.className = 'muted';
+      subtitle.textContent = metric.goal ? '目前目標：' + metric.goal + ' ' + metric.unit : '尚未設定個人營養目標';
+      section.append(title, subtitle);
+      const values = rows.filter(r => r.hasRecord).map(r => r[metric.field]);
+      const scale = Math.max(1, metric.goal || 0, ...values);
+      for (const row of rows) {
+        const line = document.createElement('div'); line.style.margin = '10px 0';
+        const label = document.createElement('div');
+        label.style.cssText = 'display:flex;justify-content:space-between;gap:8px;font-size:13px;';
+        const date = document.createElement('span'); date.textContent = row.date.slice(5);
+        const value = document.createElement('span');
+        const amount = Math.round(row[metric.field] * 10) / 10;
+        value.textContent = row.hasRecord ? amount + ' ' + metric.unit + (metric.goal && amount >= metric.goal ? ' ✓' : '') : '無紀錄';
+        label.append(date, value);
+        const track = document.createElement('div'); track.className = 'bar'; track.style.height = '13px';
+        const fill = document.createElement('div');
+        fill.style.width = row.hasRecord ? Math.min(100, row[metric.field] / scale * 100) + '%' : '0%';
+        track.appendChild(fill); line.append(label, track); section.appendChild(line);
+      }
+      root.appendChild(section);
+    }
+  }
+  const saveBeforeWeeklyCharts = save;
+  save = function () { saveBeforeWeeklyCharts(); renderWeeklyNutritionCharts(); };
+  renderWeeklyNutritionCharts();
+
   /* Relocate existing live elements into phone tabs without replacing the app logic. */
   (function setupPhoneUI(){
     const main=document.querySelector('main');
@@ -1404,7 +1472,7 @@ ${errs}
     const all=[...main.children];
     for(const node of all){
       if(node===originalGrid||node.dataset.fitPanel!==undefined||node.tagName==='SCRIPT')continue;
-      if(node.matches('#weightTrendSection,#historySection,#backupSection,#statsSection'))sections.mine.appendChild(node);
+      if(node.matches('#weightTrendSection,#historySection,#backupSection,#statsSection,#weeklyNutritionSection'))sections.mine.appendChild(node);
       else if(node.matches('.card'))sections.workout.appendChild(node);
       else if(node.tagName==='P')sections.mine.appendChild(node);
     }
