@@ -1437,6 +1437,139 @@ ${errs}
   save = function () { saveBeforeWeeklyCharts(); renderWeeklyNutritionCharts(); };
   renderWeeklyNutritionCharts();
 
+
+  // ===== A/B 重訓歷史比較：只讀取既有每日紀錄，不更動舊資料格式 =====
+  function workoutHistoryRows(exerciseId, days) {
+    const rows = [];
+    const cutoff = new Date();
+    cutoff.setHours(0,0,0,0);
+    if (days !== 'all') cutoff.setDate(cutoff.getDate() - Number(days) + 1);
+    const cutoffKey = statsLocalDate(cutoff);
+    const keys = [];
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (/^fitlife-\d{4}-\d{2}-\d{2}$/.test(k) && (days === 'all' || k.slice(8) >= cutoffKey)) keys.push(k);
+      }
+    } catch (e) { /* 儲存區可能受限 */ }
+    if (!keys.includes(key)) keys.push(key);
+    for (const k of keys) {
+      const date = k.slice(8);
+      if (date > today || (days !== 'all' && date < cutoffKey)) continue;
+      let record;
+      try { record = k === key ? data : JSON.parse(localStorage.getItem(k) || 'null'); }
+      catch (e) { continue; }
+      const st = record && record.w && record.w[exerciseId];
+      if (!st || typeof st !== 'object') continue;
+      const weight = st.weight === '' || st.weight == null ? null : Number(st.weight);
+      const sets = st.sets === '' || st.sets == null ? null : Number(st.sets);
+      const reps = st.reps === '' || st.reps == null ? null : Number(st.reps);
+      const valid = (n,max) => Number.isFinite(n) && n >= 0 && n <= max;
+      const w = valid(weight,500) ? weight : null;
+      const a = valid(sets,20) ? sets : null;
+      const r = valid(reps,200) ? reps : null;
+      if (!st.done && w === null && a === null && r === null) continue;
+      rows.push({date, weight:w, sets:a, reps:r, done:!!st.done,
+        volume:w!==null && a!==null && r!==null ? w*a*r : null});
+    }
+    return rows.sort((a,b)=>a.date.localeCompare(b.date));
+  }
+  function renderStrengthProgress() {
+    const root = document.getElementById('strengthProgressBody');
+    const pick = document.getElementById('strengthExercise');
+    const range = document.getElementById('strengthRange');
+    if (!root || !pick || !range) return;
+    const rows = workoutHistoryRows(pick.value, range.value);
+    root.replaceChildren();
+    const paragraph = (txt) => {const p=document.createElement('p');p.className='muted';p.textContent=txt;root.appendChild(p);};
+    if (!rows.length) {
+      paragraph('這段期間尚無此動作的紀錄。到「健身」輸入重量、完成組數及每組次數後，即可在這裡查看。');
+      return;
+    }
+    const done = rows.filter(x=>x.done);
+    const weightRows = rows.filter(x=>x.weight!==null);
+    const latest = rows[rows.length-1];
+    const prev = weightRows.length >= 2 ? weightRows[weightRows.length-2] : null;
+    const lastW = weightRows.length ? weightRows[weightRows.length-1] : null;
+    const cards = document.createElement('div'); cards.className='grid';
+    const stats = [
+      ['🗓️ 有紀錄日期', rows.length + ' 天'],
+      ['✅ 完成標記', done.length + ' 天'],
+      ['🏋️ 最新重量', lastW ? lastW.weight + ' kg' : '未記錄'],
+      ['📈 與前次重量比較', lastW && prev ? (lastW.weight-prev.weight > 0 ? '+' : '') + Math.round((lastW.weight-prev.weight)*10)/10 + ' kg' : '需至少兩次重量紀錄']
+    ];
+    for (const [label,value] of stats) {
+      const box=document.createElement('div');
+      box.style.cssText='border:1px solid #E7D9C8;border-radius:12px;padding:12px';
+      const name=document.createElement('div');name.className='muted';name.textContent=label;
+      const number=document.createElement('strong');number.style.cssText='display:block;font-size:19px;margin-top:5px';number.textContent=value;
+      box.append(name,number);cards.appendChild(box);
+    }
+    root.appendChild(cards);
+    const heading=document.createElement('h3');heading.textContent='最近 8 次重量紀錄';heading.style.marginTop='18px';root.appendChild(heading);
+    const chartRows=weightRows.slice(-8);
+    if (!chartRows.length) paragraph('尚未輸入重量。');
+    const scale=Math.max(1,...chartRows.map(x=>x.weight));
+    for(const item of chartRows){
+      const line=document.createElement('div');line.style.margin='10px 0';
+      const labels=document.createElement('div');labels.style.cssText='display:flex;justify-content:space-between;gap:8px;font-size:13px';
+      const d=document.createElement('span');d.textContent=item.date.slice(5);
+      const v=document.createElement('span');v.textContent=item.weight+' kg'+(item.done?' ✓':'（未勾完成）');
+      labels.append(d,v);
+      const track=document.createElement('div');track.className='bar';track.style.height='13px';
+      const fill=document.createElement('div');fill.style.width=(item.weight/scale*100)+'%';
+      track.appendChild(fill);line.append(labels,track);root.appendChild(line);
+    }
+    const title=document.createElement('h3');title.textContent='最近 12 筆詳細紀錄';title.style.marginTop='18px';root.appendChild(title);
+    const wrap=document.createElement('div');wrap.style.overflowX='auto';
+    const table=document.createElement('table');
+    table.style.cssText='width:100%;border-collapse:collapse;font-size:13px;min-width:420px';
+    const head=document.createElement('tr');
+    for(const name of ['日期','重量','組數','每組次數','訓練量*','完成']){
+      const th=document.createElement('th');th.textContent=name;th.style.cssText='text-align:left;padding:8px 5px;border-bottom:1px solid #D8C5B1';head.appendChild(th);
+    }
+    table.appendChild(head);
+    for(const item of [...rows].reverse().slice(0,12)){
+      const tr=document.createElement('tr');
+      for(const value of [item.date,item.weight===null?'—':item.weight+' kg',item.sets??'—',item.reps??'—',item.volume===null?'—':Math.round(item.volume*10)/10+' kg',item.done?'✓':'—']){
+        const td=document.createElement('td');td.textContent=String(value);td.style.cssText='padding:9px 5px;border-bottom:1px solid #E7D9C8';tr.appendChild(td);
+      }
+      table.appendChild(tr);
+    }
+    wrap.appendChild(table);root.appendChild(wrap);
+    paragraph('*訓練量＝重量 × 完成組數 × 每組次數，為簡化估算；不同器械的重量不可直接比較。未勾選完成的數值仍會列出，但不代表已完成訓練。');
+    paragraph('目前的資料是一個動作一天一組重量／組數／次數摘要，無法還原每一組不同重量。若同一天修改紀錄，以最後儲存值為準。');
+  }
+  // 原本的 renderWorkout 已負責儲存後重繪；附加只讀取歷史資料的比較面板。
+  const renderWorkoutBeforeStrength = renderWorkout;
+  renderWorkout = function () { renderWorkoutBeforeStrength(); renderStrengthProgress(); };
+  function setupStrengthProgress(panel) {
+    const card=document.createElement('section');card.className='card';
+    const h=document.createElement('h2');h.textContent='📈 重訓重量、組數與次數進步比較';card.appendChild(h);
+    const note=document.createElement('p');note.className='muted';
+    note.textContent='讀取本機已記錄的 A／B 訓練資料。選擇動作與期間，查看歷史重量及每次訓練摘要。';card.appendChild(note);
+    const select=document.createElement('select');select.id='strengthExercise';
+    for(const group of ['A','B']){
+      const og=document.createElement('optgroup');og.label=group==='A'?'A 上半身':'B 下半身';
+      for(const e of PLAN[group].ex){
+        const opt=document.createElement('option');opt.value=e.id;opt.textContent=entry(e.k).n;og.appendChild(opt);
+      }
+      select.appendChild(og);
+    }
+    const label=document.createElement('label');label.htmlFor=select.id;label.textContent='選擇訓練動作';card.append(label,select);
+    const range=document.createElement('select');range.id='strengthRange';
+    for(const [value,name] of [['30','最近 30 天'],['90','最近 90 天'],['all','全部歷史']]){
+      const opt=document.createElement('option');opt.value=value;opt.textContent=name;range.appendChild(opt);
+    }
+    const rangeLabel=document.createElement('label');rangeLabel.htmlFor=range.id;rangeLabel.textContent='查看期間';
+    card.append(rangeLabel,range);
+    const body=document.createElement('div');body.id='strengthProgressBody';card.appendChild(body);
+    select.addEventListener('change',renderStrengthProgress);
+    range.addEventListener('change',renderStrengthProgress);
+    panel.appendChild(card);
+    renderStrengthProgress();
+  }
+
   /* Relocate existing live elements into phone tabs without replacing the app logic. */
   (function setupPhoneUI(){
     const main=document.querySelector('main');
@@ -1476,6 +1609,7 @@ ${errs}
       else if(node.matches('.card'))sections.workout.appendChild(node);
       else if(node.tagName==='P')sections.mine.appendChild(node);
     }
+    setupStrengthProgress(sections.workout);
     originalGrid.remove();
     const bottom=document.createElement('nav');bottom.className='fit-tabs';bottom.setAttribute('aria-label','主要功能');
     const entries=[['home','🏠','首頁'],['food','🥗','飲食'],['recommend','🥗','推薦'],['workout','🏋️','健身'],['mine','📊','我的']];
