@@ -422,6 +422,13 @@ function save() {
     document.getElementById('waterProgress').setAttribute('aria-valuenow', Math.min(100, pct));
     const field = document.getElementById('waterGoalInput');
     if (document.activeElement !== field) field.value = goal;
+    const homeAmount = document.getElementById('homeWaterAmount');
+    if (homeAmount) {
+      homeAmount.textContent = amount;
+      document.getElementById('homeWaterGoal').textContent = goal;
+      document.getElementById('homeWaterFill').style.width = Math.min(100, pct) + '%';
+      document.getElementById('homeWaterStatus').textContent = '今日進度 ' + pct + '%｜' + (amount >= goal ? '已達目標' : '還差 ' + (goal - amount) + ' ml');
+    }
     const history = document.getElementById('waterHistory');
     const ul = document.createElement('ul');
     for (let i = 0; i < 7; i++) {
@@ -1368,7 +1375,7 @@ ${errs}
     const originalGrid=main.querySelector(':scope > .grid');
     if(!originalGrid) return;
     const sections={};
-    const headings={home:['🏠 今日總覽','你的健康紀錄一眼掌握'],food:['🥗 飲食紀錄','記錄食物及查看營養'],recommend:['🥗 飲食推薦','每日菜單與下一餐建議'],workout:['🏋️ 健身訓練','A／B／C 三天訓練計畫'],mine:['📊 我的數據','體重、歷史、統計與備份']};
+    const headings={water:['💧 喝水紀錄','每日喝水、目標設定與最近 7 天紀錄'],home:['🏠 今日總覽','你的健康紀錄一眼掌握'],food:['🥗 飲食紀錄','記錄食物及查看營養'],recommend:['🥗 飲食推薦','每日菜單與下一餐建議'],workout:['🏋️ 健身訓練','A／B／C 三天訓練計畫'],mine:['📊 我的數據','體重、歷史、統計與備份']};
     for(const [id,pair] of Object.entries(headings)){
       const panel=document.createElement('div');panel.dataset.fitPanel=id;panel.id='fit-panel-'+id;
       const heading=document.createElement('div');heading.className='fit-panel-heading';
@@ -1377,7 +1384,16 @@ ${errs}
     }
     const calorieCard=originalGrid.children[0],waterCard=originalGrid.children[1],proteinCard=originalGrid.children[2],weightCard=originalGrid.children[3];
     const homeGrid=document.createElement('div');homeGrid.className='grid';
-    homeGrid.append(waterCard,proteinCard,weightCard);sections.home.appendChild(homeGrid);
+    homeGrid.append(proteinCard,weightCard);sections.home.appendChild(homeGrid);
+    const waterSummary=document.createElement('section');
+    waterSummary.className='card';
+    waterSummary.innerHTML='<h2>💧 今日喝水</h2><div class="number"><span id="homeWaterAmount">0</span> / <span id="homeWaterGoal">2000</span> ml</div><div class="bar"><div id="homeWaterFill" style="width:0%"></div></div><p class="muted" id="homeWaterStatus">今日進度 0%</p><button type="button" onclick="switchFitTab(\'water\')">查看完整喝水紀錄 →</button>';
+    sections.home.insertBefore(waterSummary,homeGrid);
+    sections.water.appendChild(waterCard);
+    const waterBack=document.createElement('button');
+    waterBack.type='button';waterBack.className='secondary';waterBack.textContent='← 返回首頁';
+    waterBack.addEventListener('click',()=>switchFitTab('home'));
+    sections.water.insertBefore(waterBack,waterCard);
     const quick=document.createElement('div');quick.className='fit-quick';
     quick.innerHTML='<button type="button" onclick="switchFitTab(\'food\')">🥗 記錄飲食</button><button type="button" class="secondary" onclick="switchFitTab(\'recommend\')">🥗 今日吃什麼</button>';
     sections.home.insertBefore(quick,homeGrid);
@@ -1399,6 +1415,7 @@ ${errs}
     document.body.appendChild(bottom);
     window.switchFitTab=function(id){if(!sections[id])return;Object.entries(sections).forEach(([name,p])=>p.classList.toggle('active',name===id));bottom.querySelectorAll('button').forEach(b=>{const active=b.dataset.tab===id;b.classList.toggle('active',active);b.setAttribute('aria-current',active?'page':'false');});window.scrollTo(0,0);};
     switchFitTab('home');
+    renderWater();
   })();
 
  </script>
