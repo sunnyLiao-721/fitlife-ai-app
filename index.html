@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#F9F3EA">
-  <title>FitLife AI｜全頁美化版</title>
+  <title>FitLife AI｜五頁介面重新設計版</title>
   <style>
     * { box-sizing: border-box; }
     body {
@@ -232,6 +232,94 @@ header p{font-size:12px;color:#866F5D;line-height:1.5;}
 #fit-panel-recommend .fit-placeholder{background:linear-gradient(135deg,#FFF6E9,#FAEBDD);border-radius:17px;}
 @media(max-width:420px){.card{padding:15px;}#weightTrendCards,#statsCards{grid-template-columns:repeat(2,minmax(0,1fr));}.fit-section-hero{padding:15px;}}
 @media(min-width:650px){.fit-water-ring{width:220px;}}
+
+
+/* ===== 五頁介面重新設計：手機版面 / 電腦窄版預覽 ===== */
+:root{--fit-bg:#FBF4EC;--fit-brown:#895B3F;--fit-cream:#FFFCF8;--fit-border:#ECDCCB;--fit-muted:#8D7665;--fit-blue:#349BC3;}
+html{background:#EFE6DC;scroll-padding-top:16px;}
+body{max-width:480px;margin:0 auto;background:var(--fit-bg);min-height:100dvh;box-shadow:0 0 55px #593D2518;}
+header{padding:calc(20px + env(safe-area-inset-top)) 20px 14px;border:0;background:#FBF4EC;}
+header h1{font-size:28px;font-weight:850;letter-spacing:-.8px;margin:0 0 3px;color:#5B3626;}
+header p{font-size:12px;color:#947D6B;}
+main{padding:14px 14px calc(115px + env(safe-area-inset-bottom));max-width:480px;}
+.fit-panel-heading{padding:0 5px 15px;}
+.fit-panel-heading h2{font-size:20px;font-weight:800;color:#4E3328;}
+.fit-panel-heading p{font-size:12px;}
+.card{border-radius:20px;padding:17px 15px;margin:0 0 13px;background:#FFFDF9;border:1px solid #EFDFCF;box-shadow:0 6px 18px #7E533A0C;}
+.card h2{font-size:17px;color:#51382D;}
+.card button{border-radius:13px;}
+.fit-dashboard{margin:0 0 13px;}
+.fit-hero{border-radius:19px;padding:18px 17px;background:linear-gradient(125deg,#8D5A3D,#B68460);box-shadow:none;}
+.fit-hero-eyebrow{font-size:10px;letter-spacing:1px;}
+.fit-hero-title{font-size:22px;line-height:1.3;}
+.fit-hero-sub{font-size:12px;}
+.fit-date{font-size:11px;margin-top:10px;}
+.fit-dashboard-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:11px 0 0;}
+.fit-metric{padding:14px 12px;background:#FFFDFC;border:1px solid #EBDCCC;border-radius:16px;box-shadow:0 2px 9px #8663440B;}
+.fit-metric-icon{font-size:21px;}
+.fit-metric-label{font-size:12px;}
+.fit-metric-value{font-size:23px;color:#633E2B;}
+.fit-metric-note{font-size:11px;min-height:28px;}
+.fit-dashboard-title{font-size:16px;margin:20px 2px 10px;}
+.fit-quick{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:0 0 16px;max-width:none;}
+.fit-quick button{min-height:64px;padding:12px 7px;background:#B87957!important;color:#fff;font-size:17px;display:flex;flex-direction:column;gap:3px;align-items:center;justify-content:center;border:0;box-shadow:0 4px 12px #87573C1C;}
+.fit-quick button span{font-size:13px;font-weight:700;}
+.fit-quick button:nth-child(2){background:#4B9FB7!important;}
+.fit-quick button:nth-child(3){background:#C78B64!important;}
+.fit-quick button:nth-child(4){background:#839A78!important;}
+.fit-checklist{background:#FFFDFC;border:1px solid #EBDCCC;border-radius:18px;padding:15px;margin-top:10px;}
+.fit-checklist h3{margin:0 0 10px;font-size:16px;}
+.fit-check-row{display:flex;justify-content:space-between;gap:8px;padding:10px 0;border-top:1px solid #F1E8DC;font-size:13px;color:#735849;}
+.fit-check-row span:last-child{font-weight:700;color:#8B5E42;}
+#fit-panel-home>.card{margin-top:13px;}
+#fit-panel-home>.card h2{font-size:16px;}
+#fit-panel-home>.card .number{font-size:22px;}
+#fit-panel-home>.card button{width:100%;margin:8px 0 0;}
+.fit-section-hero{margin:0 0 11px;padding:14px 15px;border-radius:17px;}
+.fit-section-hero strong{font-size:16px;}
+.fit-section-hero p{font-size:12px;}
+.fit-page-date{display:table;margin:0 auto 13px;padding:9px 23px;border-radius:99px;background:#FFFDFC;border:1px solid #EBDCCC;color:#775640;font-size:12px;letter-spacing:.2px;}
+.nutrition-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:13px 0;}
+.nutrition-tile{min-width:0;display:flex;flex-direction:column;gap:5px;padding:13px 11px;background:#FCF7F0;border:1px solid #EFE0CF;border-radius:14px;}
+.nutrition-tile>span{font-size:12px;color:#7D624E;}
+.nutrition-tile>strong{font-size:22px;color:#62402C;letter-spacing:-.4px;}
+.nutrition-tile>strong small{font-size:11px;font-weight:500;}
+.nutrition-tile>small{font-size:10px;color:#927B69;line-height:1.5;flex:1;}
+.nutrition-track{height:7px;border-radius:99px;background:#E9D7C4;overflow:hidden;}
+.nutrition-fill{height:100%;background:#C7895B;border-radius:99px;}
+.fit-food-add{width:100%;margin:6px 0 14px!important;padding:13px!important;}
+.fit-food-form{scroll-margin-top:12px;}
+.fit-food-form input,.fit-food-form select{margin-bottom:10px;}
+.fit-food-list #foodList{padding:0;}
+.fit-food-list #foodList li{list-style:none;background:#FFF8F1;border:1px solid #EDDFD1;border-radius:13px;padding:12px;margin:9px 0;}
+.food-entry strong,.food-entry small{display:block;line-height:1.65;overflow-wrap:anywhere;}
+.food-actions{display:flex;gap:7px;justify-content:flex-end;margin-top:7px;}
+.food-actions button{font-size:12px;padding:7px 11px;min-height:34px;}
+#fit-panel-food>.card>h2{margin-bottom:5px;}
+#fit-panel-water>.card{background:linear-gradient(180deg,#FFFCF8,#FCF9F4);}
+#fit-panel-water .fit-water-ring{width:min(220px,65vw);box-shadow:none;}
+#fit-panel-water .fit-water-ring-number{font-size:25px;}
+#fit-panel-water .fit-water-ring-wrap+.number{display:none;}
+#fit-panel-water .fit-water-ring-wrap~#waterProgress{display:none;}
+#fit-panel-water .fit-water-ring-wrap~#waterProgressText{display:none;}
+#fit-panel-water button[onclick^="addWater"]{width:calc(50% - 7px);margin:4px 3px;background:#F3E4D4!important;color:#744D33!important;}
+#fit-panel-water button[onclick^="addWater"]+button[onclick^="addWater"]{margin-left:3px;}
+#fit-panel-water button[onclick^="addWater"]:active{background:#D6EFF3!important;}
+#fit-panel-water .fit-water-ring-pct{color:#298BA7;}
+#fit-panel-workout #dayTabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:12px 0;}
+#fit-panel-workout #dayTabs button{margin:0;padding:11px 5px;min-width:0;min-height:47px;font-size:13px;}
+#fit-panel-workout .ex{border-radius:15px;padding:13px;background:#FFF9F2;}
+#fit-panel-workout .ex h3{font-size:16px;}
+#fit-panel-workout .ex .figs{gap:8px;}
+#fit-panel-mine #weightTrendSection{margin-top:12px;}
+#fit-panel-mine .fit-chip-nav{margin:0 0 12px;}
+#fit-panel-mine #weightTrendCards,#fit-panel-mine #statsCards{grid-template-columns:repeat(2,minmax(0,1fr));}
+.fit-tabs{left:50%;right:auto;transform:translateX(-50%);width:100%;max-width:480px;bottom:0;border:1px solid #E9D7C4;border-bottom:0;border-radius:19px 19px 0 0;box-shadow:0 -5px 24px #78513B15;background:#FFFCF9F7;z-index:100;}
+.bottom-tab{min-height:58px;font-size:11px;gap:4px;color:#8A786B;}
+.bottom-tab .tab-icon{font-family:system-ui;font-size:27px;font-weight:800;line-height:1;}
+.bottom-tab.active{background:#F0DCC7!important;color:#87502E!important;}
+@media(max-width:360px){.fit-metric{padding:12px 9px;}.fit-metric-value{font-size:21px;}.fit-quick button{min-height:58px;}}
+@media(min-width:481px){body{min-height:100vh;border-left:1px solid #EBD7C3;border-right:1px solid #EBD7C3;}main{padding-left:18px;padding-right:18px;}}
 
 </style>
 </head>
@@ -1714,7 +1802,7 @@ ${errs}
     const waterSummary=document.createElement('section');
     waterSummary.className='card';
     waterSummary.innerHTML='<h2>💧 今日喝水</h2><div class="number"><span id="homeWaterAmount">0</span> / <span id="homeWaterGoal">2000</span> ml</div><div class="bar"><div id="homeWaterFill" style="width:0%"></div></div><p class="muted" id="homeWaterStatus">今日進度 0%</p><button type="button" onclick="switchFitTab(\'water\')">查看完整喝水紀錄 →</button>';
-    sections.home.insertBefore(waterSummary,homeGrid);
+    sections.home.appendChild(waterSummary);
     sections.water.appendChild(waterCard);
     const waterBack=document.createElement('button');
     waterBack.type='button';waterBack.className='secondary';waterBack.textContent='← 返回首頁';
@@ -1740,12 +1828,46 @@ ${errs}
       <div class="fit-dashboard-title">⚡ 快速開始</div>`;
     sections.home.insertBefore(dashboard,sections.home.firstElementChild.nextSibling);
     const quick=document.createElement('div');quick.className='fit-quick';
-    quick.innerHTML='<button type="button" onclick="switchFitTab(\'food\')">🥗 記錄飲食</button><button type="button" class="secondary" onclick="switchFitTab(\'recommend\')">🥗 今日吃什麼</button>';
-    sections.home.insertBefore(quick,homeGrid);
+    quick.innerHTML='<button type="button" onclick="switchFitTab(\'food\')">🍴 <span>記錄飲食</span></button><button type="button" onclick="switchFitTab(\'water\')">💧 <span>記錄喝水</span></button><button type="button" onclick="switchFitTab(\'workout\')">🏋️ <span>開始運動</span></button><button type="button" onclick="switchFitTab(\'mine\')">⚖️ <span>體重管理</span></button>';
+    dashboard.appendChild(quick);
+    const checklist=document.createElement('section');checklist.className='fit-checklist';
+    checklist.innerHTML='<h3>今日小目標</h3><div class="fit-check-row"><span>💧 喝水進度</span><span id="fitCheckWater">0%</span></div><div class="fit-check-row"><span>🥚 蛋白質進度</span><span id="fitCheckProtein">尚未設定</span></div><div class="fit-check-row"><span>🏋️ 今日運動</span><span id="fitCheckWorkout">查看健身紀錄</span></div>';
+    dashboard.appendChild(checklist);
+
     sections.food.appendChild(calorieCard);
+    sections.food.appendChild(proteinCard);
+    sections.mine.appendChild(weightCard);
+    homeGrid.remove();
+    // 拆開飲食摘要、輸入、紀錄：沿用既有元素 ID 和事件處理。
+    const foodFormCard=document.createElement('section');foodFormCard.className='card fit-food-form';
+    const foodListCard=document.createElement('section');foodListCard.className='card fit-food-list';
+    const formHeading=document.getElementById('foodFormTitle');
+    const listHeading=calorieCard.querySelector('h3:not(#foodFormTitle)');
+    if(formHeading&&listHeading){
+      let node=formHeading;
+      while(node&&node!==listHeading){const next=node.nextSibling;foodFormCard.appendChild(node);node=next;}
+      while(node){const next=node.nextSibling;foodListCard.appendChild(node);node=next;}
+      sections.food.insertBefore(foodFormCard,proteinCard);
+      sections.food.insertBefore(foodListCard,proteinCard);
+    }
+    // 進入飲食頁時，可直接跳到新增餐點。
+    const foodAddButton=document.createElement('button');foodAddButton.type='button';
+    foodAddButton.className='fit-food-add';foodAddButton.textContent='＋ 新增餐點';
+    foodAddButton.addEventListener('click',()=>foodFormCard.scrollIntoView({behavior:'smooth',block:'start'}));
+    calorieCard.insertBefore(foodAddButton,calorieCard.querySelector('details'));
+
     const recommend=document.createElement('section');recommend.className='card';
     recommend.innerHTML='<h2>🥗 每日飲食推薦</h2><div class="fit-placeholder"><strong>下一階段開發</strong><p>將新增「今天吃什麼」、「下一餐推薦」與「冰箱現有食材」三種模式，搭配熱量及蛋白質目標。</p><p class="fit-note">目前尚未提供 AI 推薦或自動營養估算；此區不是已生成的個人化菜單。</p></div>';
     sections.recommend.appendChild(recommend);
+    const recommendationButton=document.createElement('button');recommendationButton.type='button';
+    recommendationButton.className='secondary';recommendationButton.textContent='🥗 查看飲食推薦規劃';
+    recommendationButton.addEventListener('click',()=>switchFitTab('recommend'));
+    foodListCard.appendChild(recommendationButton);
+    const backFromRecommend=document.createElement('button');backFromRecommend.type='button';
+    backFromRecommend.className='secondary';backFromRecommend.textContent='← 返回飲食紀錄';
+    backFromRecommend.addEventListener('click',()=>switchFitTab('food'));
+    sections.recommend.appendChild(backFromRecommend);
+
     const all=[...main.children];
     for(const node of all){
       if(node===originalGrid||node.dataset.fitPanel!==undefined||node.tagName==='SCRIPT')continue;
@@ -1753,11 +1875,17 @@ ${errs}
       else if(node.matches('.card'))sections.workout.appendChild(node);
       else if(node.tagName==='P')sections.mine.appendChild(node);
     }
+    // 我的：體重紀錄放在體重趨勢前方；健身頁優先顯示課表。
+    const weightTrend=document.getElementById('weightTrendSection');
+    if(weightTrend)sections.mine.insertBefore(weightCard,weightTrend);
+    const dayTabs=document.getElementById('dayTabs');
+    const workoutPlanCard=dayTabs?.closest('.card');
+    if(workoutPlanCard)sections.workout.insertBefore(workoutPlanCard,sections.workout.firstElementChild.nextSibling);
     setupStrengthProgress(sections.workout);
     originalGrid.remove();
     // 各頁說明卡片：只改善導覽和視覺，不會建立不存在的 AI 功能。
     const heroConfigs={
-      food:['🥗 每一餐，都是健康的累積','記錄熱量與營養素，今天吃了什麼一目了然。','fit-hero-food'],
+      food:['🥗 每一餐，都是健康的累積','記錄熱量、蛋白質、碳水與脂肪。','fit-hero-food'],
       water:['💧 記得喝水，讓自己保持好狀態','查看今日喝水進度，快速補記飲水量。','fit-hero-water'],
       recommend:['🌿 飲食靈感，慢慢建立好習慣','此頁目前為功能規劃說明，尚未提供 AI 菜單推薦。','fit-hero-food'],
       workout:['🏋️ 穩定訓練，記錄每一次進步','選擇 A／B／C 課表，逐步累積重量、組數與次數。','fit-hero-workout'],
@@ -1769,6 +1897,12 @@ ${errs}
       const descEl=document.createElement('p');descEl.textContent=desc;
       hero.append(titleEl,descEl);
       sections[id].insertBefore(hero,sections[id].children[1]||null);
+    }
+    // 每頁日期導覽標籤，不更改日期或紀錄儲存方式。
+    for(const id of ['food','water','workout']){
+      const dateChip=document.createElement('div');dateChip.className='fit-page-date';
+      dateChip.textContent='‹     '+today+'     ›';
+      sections[id].insertBefore(dateChip,sections[id].children[2]||null);
     }
     // 我的頁面：可快速跳到實際存在的功能區塊。
     const mineNav=document.createElement('div');mineNav.className='fit-chip-nav';mineNav.setAttribute('aria-label','我的頁面快速導覽');
@@ -1785,7 +1919,7 @@ ${errs}
     const waterNumber=waterCard.querySelector('.number');
     if(waterNumber)waterNumber.insertAdjacentElement('beforebegin',waterRing);
     const bottom=document.createElement('nav');bottom.className='fit-tabs';bottom.setAttribute('aria-label','主要功能');
-    const entries=[['home','🏠','首頁'],['food','🥗','飲食'],['recommend','🥗','推薦'],['workout','🏋️','健身'],['mine','📊','我的']];
+    const entries=[['home','🏠','首頁'],['food','🍴','飲食'],['water','💧','喝水'],['workout','🏋️','健身'],['mine','👤','我的']];
     for(const [id,icon,label] of entries){const b=document.createElement('button');b.className='bottom-tab';b.type='button';b.setAttribute('aria-label',label);b.dataset.tab=id;b.innerHTML='<span class="tab-icon">'+icon+'</span><span>'+label+'</span>';b.addEventListener('click',()=>switchFitTab(id));bottom.appendChild(b);}
     document.body.appendChild(bottom);
     window.switchFitTab=function(id){if(!sections[id])return;Object.entries(sections).forEach(([name,p])=>p.classList.toggle('active',name===id));bottom.querySelectorAll('button').forEach(b=>{const active=b.dataset.tab===id;b.classList.toggle('active',active);b.setAttribute('aria-current',active?'page':'false');});window.scrollTo(0,0);};
@@ -1813,6 +1947,10 @@ ${errs}
       progress('fitDashProteinFill',protein,goals?.protein);
       progress('fitDashWaterFill',water,waterGoal);
       progress('fitDashMealsFill',data.foods.length,3);
+      set('fitCheckWater',Math.round(water/waterGoal*100)+'%');
+      set('fitCheckProtein',goals?Math.round(protein/goals.protein*100)+'%':'尚未設定');
+      const workoutState=data.w||{};
+      set('fitCheckWorkout',Object.values(workoutState).some(x=>x&&x.done)?'已記錄訓練 ✓':'尚未勾選完成');
       const ring=el('fitWaterRing');
       if(ring){
         const pct=waterGoal>0?Math.max(0,Math.round(water/waterGoal*100)):0;
