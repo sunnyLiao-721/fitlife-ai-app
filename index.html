@@ -1388,6 +1388,65 @@ ${errs}
     switchFitTab('home');
   })();
 
+  // 食物照片預覽：不會上傳或儲存照片
+  let foodPhotoPreviewUrl = null;
+
+  function previewFoodPhoto(event) {
+    const file = event.target.files[0];
+    const preview = document.getElementById('foodPhotoPreview');
+
+    if (foodPhotoPreviewUrl) {
+      URL.revokeObjectURL(foodPhotoPreviewUrl);
+      foodPhotoPreviewUrl = null;
+    }
+
+    preview.style.display = 'none';
+    preview.removeAttribute('src');
+
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert('請選擇圖片檔案。');
+      event.target.value = '';
+      return;
+    }
+
+    foodPhotoPreviewUrl = URL.createObjectURL(file);
+    preview.src = foodPhotoPreviewUrl;
+    preview.style.display = 'block';
+  }
+
+  // 複製 ChatGPT 食物營養分析提示詞
+  async function copyFoodAIPrompt() {
+    const prompt = `請根據我上傳的食物照片，估算這一餐的營養。
+
+請用繁體中文回答，包含：
+1. 食物名稱及可能的食材
+2. 每種食物的估計重量（g）
+3. 整餐總熱量（kcal）
+4. 整餐蛋白質（g）
+5. 整餐碳水化合物（g）
+6. 整餐脂肪（g）
+
+請考慮烹調油、醬料和調味料。
+如果照片無法判斷份量，請說明假設與估算範圍。
+最後提供一組方便我填入 FitLife AI 的營養數值。
+請不要把估算結果當作精確測量值。`;
+
+    try {
+      await navigator.clipboard.writeText(prompt);
+      alert('已複製分析提示詞！請開啟 ChatGPT，貼上文字並上傳食物照片。');
+    } catch (error) {
+      const box = document.createElement('textarea');
+      box.value = prompt;
+      box.style.width = '100%';
+      box.style.height = '180px';
+      document.getElementById('foodPhotoSection').appendChild(box);
+      box.select();
+      alert('無法自動複製，請長按或選取文字後手動複製。');
+    }
+  }
+
 </script>
 </body>
 </html>
