@@ -64,8 +64,6 @@
     .check input { width: 20px; height: 20px; margin: 0; }
     .bar { height: 8px; background: #e1eee6; border-radius: 99px; overflow: hidden; margin: 8px 0; }
     .bar div { height: 100%; background: #8B5E42; width: 0; }
-    .photo img { max-width: 100%; max-height: 320px; border-radius: 10px; display: block; margin: 8px 0; }
-    .photo input[type=file] { display: none; }
     @media (max-width: 420px) { .row { grid-template-columns: 1fr; } }
   
   /* Mobile-first milk-tea design; original storage and logic preserved. */
@@ -147,11 +145,20 @@
     </section>
     <section class="card">
       <h2>💧 今日喝水</h2>
-      <div class="number"><span id="water">0</span> / 2000 ml</div>
+      <div class="number"><span id="water">0</span> / <span id="waterGoalDisplay">2000</span> ml</div>
+      <div class="bar" role="progressbar" id="waterProgress" aria-label="今日喝水進度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="waterProgressFill" style="width:0%"></div></div>
+      <p class="muted" id="waterProgressText">今日進度 0%｜還差 2000 ml</p>
       <button onclick="addWater(250)">＋250 ml</button>
       <button onclick="addWater(500)">＋500 ml</button>
-      <button class="secondary" onclick="resetWater()">重新計算</button>
-      <p class="muted">目標可依活動量與個人需求調整。</p>
+      <label for="customWaterAmount">自訂喝水量（ml）</label>
+      <input id="customWaterAmount" type="number" min="1" max="5000" step="1" placeholder="例如：300">
+      <button type="button" onclick="addCustomWater()">＋加入自訂水量</button>
+      <label for="waterGoalInput">每日喝水目標（ml）</label>
+      <input id="waterGoalInput" type="number" min="100" max="10000" step="50" placeholder="例如：2000">
+      <button type="button" class="secondary" onclick="saveWaterGoal()">💾 儲存每日目標</button>
+      <button class="secondary" onclick="resetWater()">清除今日喝水量</button>
+      <details><summary>📅 最近 7 天喝水紀錄</summary><div id="waterHistory"></div></details>
+      <p class="muted">喝水目標為個人設定，並非醫療建議；更改目標不會刪除過往喝水量。</p>
     </section>
     <section class="card">
       <h2>🥚 今日蛋白質</h2>
@@ -375,8 +382,63 @@ function save() {
     });
     if(!data.foods.length){const li=document.createElement('li');li.textContent='今天還沒有餐點紀錄。';li.className='muted';list.append(li);}
   }
-  function addWater(amount) { data.water += amount; save(); }
-  function resetWater() { data.water = 0; save(); }
+  // 喝水設定單獨儲存，沿用原本每天 fitlife-日期 的 water 數值。
+  const waterGoalStorageKey = 'fitlife-water-goal-v1';
+  function getWaterGoal() {
+    try { const v = Number(localStorage.getItem(waterGoalStorageKey)); return Number.isFinite(v) && v >= 100 && v <= 10000 ? v : 2000; }
+    catch (e) { return 2000; }
+  }
+  function saveWaterGoal() {
+    const field = document.getElementById('waterGoalInput');
+    const n = Number(field.value);
+    if (!field.value.trim() || !Number.isInteger(n) || n < 100 || n > 10000) { alert('請輸入 100～10000 ml 的整數目標。'); return; }
+    try { localStorage.setItem(waterGoalStorageKey, String(n)); }
+    catch (e) { alert('無法儲存喝水目標，請確認瀏覽器儲存權限。'); return; }
+    renderWater(); alert('已儲存每日喝水目標。');
+  }
+  function addWater(amount) {
+    if (!Number.isFinite(amount) || amount <= 0 || amount > 5000) return;
+    data.water = Math.max(0, Number(data.water) || 0) + amount;
+    save();
+  }
+  function addCustomWater() {
+    const field = document.getElementById('customWaterAmount');
+    const n = Number(field.value);
+    if (!field.value.trim() || !Number.isInteger(n) || n < 1 || n > 5000) { alert('請輸入 1～5000 ml 的整數水量。'); return; }
+    addWater(n); field.value = '';
+  }
+  function resetWater() {
+    if (!confirm('確定要將今天的喝水量歸零嗎？')) return;
+    data.water = 0; save();
+  }
+  function renderWater() {
+    const goal = getWaterGoal();
+    const amount = Math.max(0, Number(data.water) || 0);
+    const pct = Math.round(amount / goal * 100);
+    document.getElementById('water').textContent = amount;
+    document.getElementById('waterGoalDisplay').textContent = goal;
+    document.getElementById('waterProgressFill').style.width = Math.min(100, pct) + '%';
+    document.getElementById('waterProgressText').textContent = '今日進度 ' + pct + '%｜' + (amount >= goal ? '已達目標' : '還差 ' + (goal - amount) + ' ml');
+    document.getElementById('waterProgress').setAttribute('aria-valuenow', Math.min(100, pct));
+    const field = document.getElementById('waterGoalInput');
+    if (document.activeElement !== field) field.value = goal;
+    const history = document.getElementById('waterHistory');
+    const ul = document.createElement('ul');
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(); date.setHours(12,0,0,0); date.setDate(date.getDate() - i);
+      const day = date.getFullYear() + '-' + String(date.getMonth()+1).padStart(2,'0') + '-' + String(date.getDate()).padStart(2,'0');
+      let value = 0, recorded = false;
+      try {
+        const raw = localStorage.getItem('fitlife-' + day);
+        if (raw !== null) { const parsed = JSON.parse(raw); value = Math.max(0, Number(parsed.water) || 0); recorded = true; }
+      } catch (e) { /* 忽略損壞的單日紀錄 */ }
+      if (day === today) { value = amount; recorded = true; }
+      const li = document.createElement('li');
+      li.textContent = day + '：' + (recorded ? value + ' ml' : '尚無紀錄');
+      ul.appendChild(li);
+    }
+    history.replaceChildren(ul);
+  }
   function addWeight() {
     const weight = Number(document.getElementById('weightInput').value);
     if (!Number.isFinite(weight) || weight <= 0 || weight > 500) {
@@ -389,7 +451,7 @@ function save() {
   function render() {
     document.getElementById('calories').textContent = data.foods.reduce((s,f)=>s+f.calories,0);
     document.getElementById('protein').textContent = data.foods.reduce((s,f)=>s+f.protein,0);
-    document.getElementById('water').textContent = data.water;
+    renderWater();
     renderNutrition();
     document.getElementById('weightList').innerHTML = data.weights.map(w=>`<li>${w.date}：${w.weight} kg</li>`).join('');
     renderWorkout();
@@ -940,7 +1002,7 @@ ${errs}
   }
   // ===== FitLife AI 備份與還原（僅處理本 APP 的 localStorage 鍵） =====
   const FITLIFE_BACKUP_VERSION = 1;
-  const fitlifeStorageKey = k => /^fitlife-\d{4}-\d{2}-\d{2}$/.test(k) || k === 'fitlife-cardio-v1' || k === 'fitlife-weight-goals-v1';
+  const fitlifeStorageKey = k => /^fitlife-\d{4}-\d{2}-\d{2}$/.test(k) || k === 'fitlife-cardio-v1' || k === 'fitlife-weight-goals-v1' || k === 'fitlife-water-goal-v1';
   function exportFitlifeBackup() {
     try {
       const records = {};
@@ -984,7 +1046,10 @@ ${errs}
       }
       for (const [k, raw] of entries) {
         const obj = JSON.parse(raw);
-        if (k === 'fitlife-weight-goals-v1') {
+        if (k === 'fitlife-water-goal-v1') {
+          const n = Number(obj);
+          if (!Number.isInteger(n) || n < 100 || n > 10000) throw new Error('喝水目標設定格式不正確');
+        } else if (k === 'fitlife-weight-goals-v1') {
           if (!obj || typeof obj !== 'object' || Array.isArray(obj) ||
               (obj.height !== null && (!Number.isFinite(obj.height) || obj.height < 100 || obj.height > 250)) ||
               (obj.target !== null && (!Number.isFinite(obj.target) || obj.target <= 0 || obj.target > 500)))
@@ -1303,7 +1368,7 @@ ${errs}
     const originalGrid=main.querySelector(':scope > .grid');
     if(!originalGrid) return;
     const sections={};
-    const headings={home:['🏠 今日總覽','你的健康紀錄一眼掌握'],food:['📸 飲食紀錄','拍照、記錄食物及查看營養'],recommend:['🥗 飲食推薦','每日菜單與下一餐建議'],workout:['🏋️ 健身訓練','A／B／C 三天訓練計畫'],mine:['📊 我的數據','體重、歷史、統計與備份']};
+    const headings={home:['🏠 今日總覽','你的健康紀錄一眼掌握'],food:['🥗 飲食紀錄','記錄食物及查看營養'],recommend:['🥗 飲食推薦','每日菜單與下一餐建議'],workout:['🏋️ 健身訓練','A／B／C 三天訓練計畫'],mine:['📊 我的數據','體重、歷史、統計與備份']};
     for(const [id,pair] of Object.entries(headings)){
       const panel=document.createElement('div');panel.dataset.fitPanel=id;panel.id='fit-panel-'+id;
       const heading=document.createElement('div');heading.className='fit-panel-heading';
@@ -1314,20 +1379,9 @@ ${errs}
     const homeGrid=document.createElement('div');homeGrid.className='grid';
     homeGrid.append(waterCard,proteinCard,weightCard);sections.home.appendChild(homeGrid);
     const quick=document.createElement('div');quick.className='fit-quick';
-    quick.innerHTML='<button type="button" onclick="switchFitTab(\'food\')">📷 記錄飲食</button><button type="button" class="secondary" onclick="switchFitTab(\'recommend\')">🥗 今日吃什麼</button>';
+    quick.innerHTML='<button type="button" onclick="switchFitTab(\'food\')">🥗 記錄飲食</button><button type="button" class="secondary" onclick="switchFitTab(\'recommend\')">🥗 今日吃什麼</button>';
     sections.home.insertBefore(quick,homeGrid);
     sections.food.appendChild(calorieCard);
-    const photo=document.createElement('section');photo.className='card';
-    photo.innerHTML='<h2>📸 食物照片</h2><p class="fit-note">可用手機相機拍照或從相簿挑選。此階段僅預覽照片，尚未啟用 AI 自動辨識或儲存照片。</p><label for="fitFoodPhoto">選擇食物照片</label><input id="fitFoodPhoto" type="file" accept="image/*" capture="environment"><img id="fitPhotoPreview" alt="你選擇的食物照片" style="display:none;max-width:100%;max-height:280px;border-radius:12px;margin-top:10px"><p id="fitPhotoHint" class="fit-note"></p>';
-    sections.food.insertBefore(photo,calorieCard);
-    const pInput=photo.querySelector('input');let imageURL=null;
-    pInput.addEventListener('change',function(){
-      const f=this.files&&this.files[0];const img=document.getElementById('fitPhotoPreview'),hint=document.getElementById('fitPhotoHint');
-      if(imageURL){URL.revokeObjectURL(imageURL);imageURL=null;}
-      if(!f){img.style.display='none';hint.textContent='';return;}
-      if(!f.type.startsWith('image/')){this.value='';img.style.display='none';hint.textContent='請選擇圖片檔案。';return;}
-      imageURL=URL.createObjectURL(f);img.src=imageURL;img.style.display='block';hint.textContent='照片已選擇。目前請在下方手動輸入食物名稱、熱量及蛋白質；AI 辨識將在確認免費安全方案後接入。';
-    });
     const recommend=document.createElement('section');recommend.className='card';
     recommend.innerHTML='<h2>🥗 每日飲食推薦</h2><div class="fit-placeholder"><strong>下一階段開發</strong><p>將新增「今天吃什麼」、「下一餐推薦」與「冰箱現有食材」三種模式，搭配熱量及蛋白質目標。</p><p class="fit-note">目前尚未提供 AI 推薦或自動營養估算；此區不是已生成的個人化菜單。</p></div>';
     sections.recommend.appendChild(recommend);
@@ -1340,7 +1394,7 @@ ${errs}
     }
     originalGrid.remove();
     const bottom=document.createElement('nav');bottom.className='fit-tabs';bottom.setAttribute('aria-label','主要功能');
-    const entries=[['home','🏠','首頁'],['food','📸','飲食'],['recommend','🥗','推薦'],['workout','🏋️','健身'],['mine','📊','我的']];
+    const entries=[['home','🏠','首頁'],['food','🥗','飲食'],['recommend','🥗','推薦'],['workout','🏋️','健身'],['mine','📊','我的']];
     for(const [id,icon,label] of entries){const b=document.createElement('button');b.className='bottom-tab';b.type='button';b.setAttribute('aria-label',label);b.dataset.tab=id;b.innerHTML='<span class="tab-icon">'+icon+'</span><span>'+label+'</span>';b.addEventListener('click',()=>switchFitTab(id));bottom.appendChild(b);}
     document.body.appendChild(bottom);
     window.switchFitTab=function(id){if(!sections[id])return;Object.entries(sections).forEach(([name,p])=>p.classList.toggle('active',name===id));bottom.querySelectorAll('button').forEach(b=>{const active=b.dataset.tab===id;b.classList.toggle('active',active);b.setAttribute('aria-current',active?'page':'false');});window.scrollTo(0,0);};
