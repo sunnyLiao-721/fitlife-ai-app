@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#F9F3EA">
-  <title>FitLife AI｜飲食營養升級版</title>
+  <title>FitLife AI｜全頁美化版</title>
   <style>
     * { box-sizing: border-box; }
     body {
@@ -147,6 +147,91 @@
   .fit-quick button {border-radius:14px;min-height:54px;box-shadow:0 4px 12px #8B5E4215;}
   @media(max-width:360px){.fit-metric-value {font-size:21px;}.fit-metric {padding:12px 10px;}.fit-hero-title {font-size:22px;}}
   @media(min-width:650px){.fit-dashboard-grid {grid-template-columns:repeat(4,minmax(0,1fr));}}
+
+
+/* ===== 全頁一致性設計 v2：純外觀，不改變每日資料結構 ===== */
+:root{--milk:#F9F3EA;--cream:#FFFEFC;--sand:#F1E3D3;--coffee:#8B5E42;--coffee-dark:#68432F;--ink:#382D27;--quiet:#79695D;--edge:#E7D9C8;--aqua:#4D9EAE;--leaf:#8BA47D;}
+html{scroll-behavior:smooth;scroll-padding-top:18px;}
+body{background:linear-gradient(180deg,#F8EEE3 0,#FBF6F0 260px,#F9F3EA 100%);color:var(--ink);}
+main{max-width:900px;padding:17px 13px calc(112px + env(safe-area-inset-bottom));}
+header{position:relative;padding:calc(15px + env(safe-area-inset-top)) 18px 16px;background:linear-gradient(120deg,#FFFDF9,#F3E6D7);}
+header h1{font-family:Georgia,"Noto Serif TC",serif;font-size:27px;color:#4C3326;letter-spacing:-.4px;}
+header p{font-size:12px;color:#866F5D;line-height:1.5;}
+.card{padding:18px;border:1px solid var(--edge);border-radius:20px;background:#FFFEFC;box-shadow:0 6px 22px #7250360D;}
+.card h2{font-size:18px;letter-spacing:-.3px;margin-bottom:10px;color:#51392C;}
+.card h3{font-size:16px;color:#634531;margin:18px 0 10px;}
+.card p{line-height:1.65;}
+.card label{display:block;font-size:13px;font-weight:600;color:#745A48;margin:10px 0 3px;}
+.card input:not([type="checkbox"]):not([type="file"]),.card select,.card textarea{border-radius:12px!important;background:#FFFCF8!important;border-color:#E1CFBD!important;padding:11px 12px;}
+.card input:focus,.card select:focus,.card textarea:focus{outline:2px solid #BD9878;outline-offset:1px;}
+.card button{border-radius:12px;padding:10px 13px;box-shadow:0 3px 9px #8B5E4212;max-width:100%;white-space:normal;}
+.card button.secondary{box-shadow:none;}
+.card details{border:1px solid #E9DDCF;border-radius:14px;padding:11px 12px;background:#FFF9F2;margin:13px 0;}
+.card details summary{font-size:14px;list-style-position:inside;padding:2px;}
+.card details[open] summary{margin-bottom:12px;}
+.card .number{font-size:27px;letter-spacing:-.6px;}
+.card .bar{height:10px;border-radius:999px;background:#EFE0D0;}
+.card .bar div{background:linear-gradient(90deg,#A57B57,#C49A70);}
+.fit-panel-heading{margin:2px 0 14px;padding:0 4px;}
+.fit-panel-heading h2{font-size:23px;font-weight:800;letter-spacing:-.6px;margin:0 0 5px;}
+.fit-panel-heading p{font-size:13px;line-height:1.6;color:#8A7564;}
+.fit-section-hero{background:linear-gradient(120deg,#F1E0D0,#F8ECE1);border:1px solid #E7D3C0;border-radius:20px;padding:17px 17px 15px;margin:0 0 14px;position:relative;overflow:hidden;}
+.fit-section-hero::after{content:"✦";position:absolute;right:13px;top:-23px;font-size:92px;opacity:.12;color:#8B5E42;pointer-events:none;}
+.fit-section-hero strong{display:block;font-size:18px;color:#67442F;margin-bottom:6px;position:relative;}
+.fit-section-hero p{font-size:13px;color:#795E4B;line-height:1.6;margin:0;position:relative;}
+.fit-section-hero.fit-hero-water{background:linear-gradient(120deg,#E8F4F3,#F6F6ED);border-color:#CEE5E5;}
+.fit-section-hero.fit-hero-water strong{color:#347F91;}
+.fit-section-hero.fit-hero-water p{color:#587B7C;}
+.fit-section-hero.fit-hero-workout{background:linear-gradient(120deg,#F1E8DB,#F8F1E6);}
+.fit-section-hero.fit-hero-mine{background:linear-gradient(120deg,#EDEAE0,#F6F0E6);}
+.fit-quick button{min-height:54px;font-size:14px;}
+.fit-tabs{padding:7px 5px max(9px,env(safe-area-inset-bottom));background:#FFFEFDF5;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);}
+.bottom-tab{font-size:11px;min-height:58px;border-radius:14px;transition:background .15s,color .15s;}
+.bottom-tab .tab-icon{font-size:22px;}
+.bottom-tab.active{background:#F0DDC8!important;color:#6D432A!important;}
+.bottom-tab:active{transform:scale(.96);}
+.fit-chip-nav{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:1px 1px 11px;margin:0 0 7px;}
+.fit-chip-nav::-webkit-scrollbar{display:none;}
+.fit-chip-nav button{flex:0 0 auto;border-radius:99px;background:#F4E8DB;color:#704C35;border:1px solid #E4CFB8;box-shadow:none;min-height:38px;font-size:12px;padding:7px 13px;margin:0;}
+.fit-chip-nav button:focus-visible{outline:2px solid #8B5E42;}
+#nutritionSummary{border-radius:15px;overflow:hidden;}
+#nutritionSummary .bar div{background:linear-gradient(90deg,#B87B52,#D8AD81);}
+#foodList{list-style:none;padding:0;margin:8px 0;}
+#foodList li{background:#FFF9F3;border:1px solid #E9DDCF;border-radius:14px;padding:12px;margin:9px 0;line-height:1.6;overflow-wrap:anywhere;}
+#waterProgress{height:14px;background:#E1EFF0;margin:14px 0 9px;}
+#waterProgressFill{background:linear-gradient(90deg,#65B5C1,#3F8CA6);}
+#waterHistory{border-radius:12px;overflow:hidden;}
+.fit-water-ring-wrap{display:flex;align-items:center;justify-content:center;margin:8px auto 18px;}
+.fit-water-ring{width:min(230px,70vw);aspect-ratio:1;border-radius:50%;background:conic-gradient(#58A8BA 0%,#DFEBED 0%);display:grid;place-items:center;box-shadow:0 8px 22px #4D9EAE18;transition:background .2s;}
+.fit-water-ring-inner{width:77%;height:77%;border-radius:50%;background:#FFFEFC;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:10px;}
+.fit-water-ring-icon{font-size:23px;margin-bottom:4px;}
+.fit-water-ring-number{font-size:28px;font-weight:800;color:#326F86;line-height:1.25;}
+.fit-water-ring-goal{font-size:13px;color:#78939A;margin-top:4px;}
+.fit-water-ring-pct{font-size:15px;color:#358FA7;font-weight:700;margin-top:5px;}
+#fit-panel-water>.card button:not(.secondary){background:#478DA3;}
+#fit-panel-water>.card .number{color:#378CA4;}
+#dayTabs{display:flex;gap:8px;flex-wrap:wrap;margin:15px 0;}
+#dayTabs button{flex:1 1 90px;min-width:0;margin:0;min-height:44px;border-radius:13px;}
+.ex{background:#FFFCF8;border:1px solid #E8DACB;border-radius:17px;padding:15px;margin:12px 0;}
+.ex.done{background:#F0F6EC;border-color:#B8D1B0;}
+.ex h3{color:#553C2C;margin-bottom:10px;}
+.ex .tag{background:#F1E3D3;color:#76533B;}
+.ex .row{gap:8px;}
+.ex .imgbox{border-radius:12px;background:#F9F3EA;}
+.ex .check{border-top:1px dashed #E5D7C8;margin-top:12px;padding-top:12px;}
+#weightTrendCards,#statsCards{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
+#weightTrendCards>div,#statsCards>div{border-radius:15px!important;background:#FFF9F3!important;padding:13px!important;min-width:0;overflow-wrap:anywhere;}
+#weightTrendChart,#statsChart,#weeklyNutritionCharts{background:#FFFDF9;border:1px solid #EEE0D1;border-radius:16px;padding:12px 9px;overflow-x:auto;}
+#historyResult{background:#FFF9F3;border-radius:14px;padding:5px 12px;margin-top:12px;}
+#backupSection{border-color:#C8DCCF;background:linear-gradient(180deg,#FFFEFC,#F6FBF7);}
+#backupSection input[type=file]{width:100%;font-size:13px;}
+#strengthProgressBody .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
+#strengthProgressBody .grid>div{background:#FFF9F3;border-color:#E8DACB!important;}
+#strengthProgressBody table{background:#FFFEFC;}
+#strengthProgressBody th{color:#6E4D36;}
+#fit-panel-recommend .fit-placeholder{background:linear-gradient(135deg,#FFF6E9,#FAEBDD);border-radius:17px;}
+@media(max-width:420px){.card{padding:15px;}#weightTrendCards,#statsCards{grid-template-columns:repeat(2,minmax(0,1fr));}.fit-section-hero{padding:15px;}}
+@media(min-width:650px){.fit-water-ring{width:220px;}}
 
 </style>
 </head>
@@ -1670,6 +1755,35 @@ ${errs}
     }
     setupStrengthProgress(sections.workout);
     originalGrid.remove();
+    // 各頁說明卡片：只改善導覽和視覺，不會建立不存在的 AI 功能。
+    const heroConfigs={
+      food:['🥗 每一餐，都是健康的累積','記錄熱量與營養素，今天吃了什麼一目了然。','fit-hero-food'],
+      water:['💧 記得喝水，讓自己保持好狀態','查看今日喝水進度，快速補記飲水量。','fit-hero-water'],
+      recommend:['🌿 飲食靈感，慢慢建立好習慣','此頁目前為功能規劃說明，尚未提供 AI 菜單推薦。','fit-hero-food'],
+      workout:['🏋️ 穩定訓練，記錄每一次進步','選擇 A／B／C 課表，逐步累積重量、組數與次數。','fit-hero-workout'],
+      mine:['📊 看見你的每一步改變','體重、營養趨勢、訓練統計與資料備份集中管理。','fit-hero-mine']
+    };
+    for(const [id,[title,desc,cls]] of Object.entries(heroConfigs)){
+      const hero=document.createElement('div');hero.className='fit-section-hero '+cls;
+      const titleEl=document.createElement('strong');titleEl.textContent=title;
+      const descEl=document.createElement('p');descEl.textContent=desc;
+      hero.append(titleEl,descEl);
+      sections[id].insertBefore(hero,sections[id].children[1]||null);
+    }
+    // 我的頁面：可快速跳到實際存在的功能區塊。
+    const mineNav=document.createElement('div');mineNav.className='fit-chip-nav';mineNav.setAttribute('aria-label','我的頁面快速導覽');
+    const mineLinks=[['⚖️ 體重趨勢','weightTrendSection'],['📊 營養統計','weeklyNutritionSection'],['🏋️ 運動統計','statsSection'],['📅 歷史紀錄','historySection'],['💾 資料備份','backupSection']];
+    for(const [name,id] of mineLinks){
+      const btn=document.createElement('button');btn.type='button';btn.textContent=name;
+      btn.addEventListener('click',()=>document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'}));
+      mineNav.appendChild(btn);
+    }
+    sections.mine.insertBefore(mineNav,sections.mine.children[2]||null);
+    // 喝水頁面：以現有喝水紀錄顯示圓環，不另存資料。
+    const waterRing=document.createElement('div');waterRing.className='fit-water-ring-wrap';
+    waterRing.innerHTML='<div class="fit-water-ring" id="fitWaterRing" role="img" aria-label="今日喝水進度"><div class="fit-water-ring-inner"><div class="fit-water-ring-icon">💧</div><div class="fit-water-ring-number" id="fitWaterRingAmount">0</div><div class="fit-water-ring-goal" id="fitWaterRingGoal">/ 2000 ml</div><div class="fit-water-ring-pct" id="fitWaterRingPct">0%</div></div></div>';
+    const waterNumber=waterCard.querySelector('.number');
+    if(waterNumber)waterNumber.insertAdjacentElement('beforebegin',waterRing);
     const bottom=document.createElement('nav');bottom.className='fit-tabs';bottom.setAttribute('aria-label','主要功能');
     const entries=[['home','🏠','首頁'],['food','🥗','飲食'],['recommend','🥗','推薦'],['workout','🏋️','健身'],['mine','📊','我的']];
     for(const [id,icon,label] of entries){const b=document.createElement('button');b.className='bottom-tab';b.type='button';b.setAttribute('aria-label',label);b.dataset.tab=id;b.innerHTML='<span class="tab-icon">'+icon+'</span><span>'+label+'</span>';b.addEventListener('click',()=>switchFitTab(id));bottom.appendChild(b);}
@@ -1699,6 +1813,15 @@ ${errs}
       progress('fitDashProteinFill',protein,goals?.protein);
       progress('fitDashWaterFill',water,waterGoal);
       progress('fitDashMealsFill',data.foods.length,3);
+      const ring=el('fitWaterRing');
+      if(ring){
+        const pct=waterGoal>0?Math.max(0,Math.round(water/waterGoal*100)):0;
+        ring.style.background='conic-gradient(#58A8BA 0% '+Math.min(100,pct)+'%,#DFEBED '+Math.min(100,pct)+'% 100%)';
+        ring.setAttribute('aria-label','今日喝水 '+water+' 毫升，達成目標 '+pct+'%');
+        set('fitWaterRingAmount',water.toLocaleString('zh-TW')+' ml');
+        set('fitWaterRingGoal','/ '+waterGoal.toLocaleString('zh-TW')+' ml');
+        set('fitWaterRingPct',pct+'%');
+      }
     }
     const previousRenderDashboard=render;
     render=function(){previousRenderDashboard();updateFitDashboard();};
