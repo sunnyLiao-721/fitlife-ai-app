@@ -131,47 +131,6 @@
         <button type="button" onclick="saveAutoNutritionProfile()">儲存個人資料並自動計算</button>
       </details>
       
-<div class="photo" id="foodPhotoSection">
-  <h3>📸 食物拍照營養估算</h3>
-  <p class="muted">
-    拍攝食物照片，交給 ChatGPT 協助估算營養。
-    估算結果需要自行確認並填入下方餐點欄位。
-  </p>
-
-  <label for="foodPhotoInput">拍照或選擇食物照片</label>
-  <input
-    type="file"
-    id="foodPhotoInput"
-    accept="image/*"
-    style="display:block"
-    onchange="previewFoodPhoto(event)"
-  >
-
-  <img
-    id="foodPhotoPreview"
-    alt="食物照片預覽"
-    style="display:none;max-width:100%;max-height:280px;border-radius:12px;margin:10px 0"
-  >
-
-  <button type="button" onclick="copyFoodAIPrompt()">
-    📋 複製 AI 營養分析提示詞
-  </button>
-
-  <a
-    href="https://chatgpt.com/"
-    target="_blank"
-    rel="noopener noreferrer"
-    style="display:inline-block;margin:10px 0"
-  >
-    🤖 開啟 ChatGPT 分析照片
-  </a>
-
-  <p class="muted">
-    照片只在目前頁面預覽，不會自動上傳或儲存。
-    請自行將照片上傳至 ChatGPT。
-  </p>
-</div>
-
       <h3 id="foodFormTitle">➕ 新增餐點</h3>
       <label for="mealType">餐別</label>
       <select id="mealType"><option>早餐</option><option>午餐</option><option>晚餐</option><option>點心</option></select>
