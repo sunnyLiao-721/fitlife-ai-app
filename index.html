@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#F9F3EA">
-  <title>FitLife AI｜米白奶茶手機版</title>
+  <title>FitLife AI｜飲食營養升級版</title>
   <style>
     * { box-sizing: border-box; }
     body {
@@ -120,17 +120,30 @@
 <main>
   <div class="grid">
     <section class="card">
-      <h2>🔥 今日熱量</h2>
-      <div class="number"><span id="calories">0</span> kcal</div>
-      <p class="muted">記錄已吃下的食物熱量</p>
-      <label>食物名稱</label>
-      <input id="food" placeholder="例如：雞胸肉便當">
-      <label>熱量（大卡）</label>
-      <input id="calorieInput" type="number" min="0" placeholder="例如：450">
-      <label>蛋白質（克）</label>
-      <input id="proteinInput" type="number" min="0" placeholder="例如：30">
-      <button onclick="addFood()">新增飲食</button>
-      <ul id="foodList"></ul>
+      <h2>🥗 今日飲食營養</h2>
+      <p class="muted">依你輸入的食物數值加總；營養數值不會自動辨識。</p>
+      <div class="nutrition-summary" id="nutritionSummary" aria-live="polite"></div>
+      <details><summary>⚙️ 設定每日營養目標</summary>
+        <p class="muted">預設值僅供測試，可依個人需求調整，並非醫療或營養處方。</p>
+        <label for="goalCalories">每日熱量目標（kcal）</label><input id="goalCalories" type="number" min="1" step="1" value="1800">
+        <label for="goalProtein">蛋白質目標（g）</label><input id="goalProtein" type="number" min="1" step="1" value="120">
+        <label for="goalCarbs">碳水化合物目標（g）</label><input id="goalCarbs" type="number" min="1" step="1" value="200">
+        <label for="goalFat">脂肪目標（g）</label><input id="goalFat" type="number" min="1" step="1" value="60">
+        <button type="button" onclick="saveNutritionGoals()">儲存今日目標</button>
+      </details>
+      <h3 id="foodFormTitle">➕ 新增餐點</h3>
+      <label for="mealType">餐別</label>
+      <select id="mealType"><option>早餐</option><option>午餐</option><option>晚餐</option><option>點心</option></select>
+      <label for="food">食物名稱</label><input id="food" placeholder="例如：雞胸肉便當">
+      <label for="calorieInput">熱量（kcal）</label><input id="calorieInput" type="number" min="0" step="any" placeholder="例如：450">
+      <label for="proteinInput">蛋白質（g）</label><input id="proteinInput" type="number" min="0" step="any" placeholder="例如：30">
+      <label for="carbsInput">碳水化合物（g）</label><input id="carbsInput" type="number" min="0" step="any" placeholder="例如：55">
+      <label for="fatInput">脂肪（g）</label><input id="fatInput" type="number" min="0" step="any" placeholder="例如：12">
+      <input type="hidden" id="editFoodIndex" value="">
+      <button id="saveFoodButton" type="button" onclick="addFood()">儲存餐點</button>
+      <button id="cancelFoodButton" type="button" class="secondary" onclick="cancelEditFood()" style="display:none">取消編輯</button>
+      <h3>📋 今日餐點</h3><ul id="foodList"></ul>
+      <span id="calories" hidden>0</span>
     </section>
     <section class="card">
       <h2>💧 今日喝水</h2>
@@ -269,18 +282,80 @@ function save() {
 
   render();
 }
-  function addFood() {
-    const name = document.getElementById('food').value.trim();
-    const calories = Number(document.getElementById('calorieInput').value);
-    const protein = Number(document.getElementById('proteinInput').value);
-    if (!name || calories < 0 || !Number.isFinite(calories) || protein < 0 || !Number.isFinite(protein)) {
-      alert('請輸入食物名稱、有效熱量及蛋白質數值。'); return;
+  const DEFAULT_NUTRITION_GOALS = {calories:1800,protein:120,carbs:200,fat:60};
+  function nutritionGoals(){return {...DEFAULT_NUTRITION_GOALS,...(data.nutritionGoals || {})};}
+  function saveNutritionGoals(){
+    const values={};
+    for(const k of ['calories','protein','carbs','fat']){
+      const value=Number(document.getElementById('goal'+k[0].toUpperCase()+k.slice(1)).value);
+      if(!Number.isFinite(value)||value<=0||value>100000){alert('請輸入有效的每日營養目標。');return;}
+      values[k]=value;
     }
-    data.foods.push({name, calories, protein});
-    document.getElementById('food').value = '';
-    document.getElementById('calorieInput').value = '';
-    document.getElementById('proteinInput').value = '';
-    save();
+    data.nutritionGoals=values;save();alert('今日營養目標已儲存。');
+  }
+  function cancelEditFood(){
+    document.getElementById('editFoodIndex').value='';
+    for(const id of ['food','calorieInput','proteinInput','carbsInput','fatInput'])document.getElementById(id).value='';
+    document.getElementById('mealType').value='早餐';
+    document.getElementById('foodFormTitle').textContent='➕ 新增餐點';
+    document.getElementById('saveFoodButton').textContent='儲存餐點';
+    document.getElementById('cancelFoodButton').style.display='none';
+  }
+  function addFood() {
+    const name=document.getElementById('food').value.trim();
+    const vals={};
+    for(const [key,id] of [['calories','calorieInput'],['protein','proteinInput'],['carbs','carbsInput'],['fat','fatInput']]){
+      const input=document.getElementById(id);
+      if(input.value.trim()===''||!Number.isFinite(Number(input.value))||Number(input.value)<0||Number(input.value)>100000){
+        alert('請填寫有效的熱量、蛋白質、碳水化合物與脂肪數值。');return;
+      }
+      vals[key]=Number(input.value);
+    }
+    if(!name){alert('請輸入食物名稱。');return;}
+    const entry={name,meal:document.getElementById('mealType').value,...vals};
+    const edit=document.getElementById('editFoodIndex').value;
+    if(edit!==''){
+      const i=Number(edit);
+      if(!Number.isInteger(i)||i<0||i>=data.foods.length){alert('編輯項目已不存在。');return;}
+      data.foods[i]=entry;
+    }else data.foods.push(entry);
+    cancelEditFood();save();
+  }
+  function editFood(i){
+    const f=data.foods[i];if(!f)return;
+    document.getElementById('editFoodIndex').value=String(i);
+    document.getElementById('food').value=f.name||'';
+    document.getElementById('mealType').value=['早餐','午餐','晚餐','點心'].includes(f.meal)?f.meal:'早餐';
+    for(const [key,id] of [['calories','calorieInput'],['protein','proteinInput'],['carbs','carbsInput'],['fat','fatInput']])document.getElementById(id).value=f[key]??0;
+    document.getElementById('foodFormTitle').textContent='✏️ 編輯餐點';
+    document.getElementById('saveFoodButton').textContent='儲存修改';
+    document.getElementById('cancelFoodButton').style.display='inline-block';
+    document.getElementById('foodFormTitle').scrollIntoView({behavior:'smooth',block:'start'});
+  }
+  function deleteFood(i){
+    if(!data.foods[i]||!confirm('確定刪除「'+data.foods[i].name+'」嗎？'))return;
+    data.foods.splice(i,1);cancelEditFood();save();
+  }
+  function renderNutrition(){
+    const goals=nutritionGoals();
+    const metrics=[['calories','🔥 熱量','kcal'],['protein','🥚 蛋白質','g'],['carbs','🍚 碳水化合物','g'],['fat','🥑 脂肪','g']];
+    const total=k=>data.foods.reduce((sum,f)=>sum+(Number.isFinite(Number(f[k]))?Number(f[k]):0),0);
+    document.getElementById('nutritionSummary').innerHTML=metrics.map(([k,label,unit])=>{
+      const amount=Math.round(total(k)*10)/10, goal=goals[k], pct=Math.min(100,amount/goal*100);
+      return `<div class="nutrition-tile"><span>${label}</span><strong>${amount} <small>${unit}</small></strong><small>目標 ${goal} ${unit}｜剩餘 ${Math.max(0,Math.round((goal-amount)*10)/10)} ${unit}${amount>goal?'（已超過目標）':''}</small><div class="nutrition-track"><div class="nutrition-fill" style="width:${pct}%"></div></div></div>`;
+    }).join('');
+    for(const [k] of metrics){const input=document.getElementById('goal'+k[0].toUpperCase()+k.slice(1));if(document.activeElement!==input)input.value=goals[k];}
+    const list=document.getElementById('foodList');list.replaceChildren();
+    data.foods.forEach((f,i)=>{
+      const li=document.createElement('li');li.className='food-entry';
+      const name=document.createElement('strong');name.textContent=(f.meal||'未分類')+'｜'+(f.name||'未命名');
+      const desc=document.createElement('small');desc.textContent=`${f.calories||0} kcal｜蛋白質 ${f.protein||0} g｜碳水 ${f.carbs??'未記錄'} g｜脂肪 ${f.fat??'未記錄'} g`;
+      const actions=document.createElement('div');actions.className='food-actions';
+      const edit=document.createElement('button');edit.type='button';edit.className='secondary';edit.textContent='✏️ 編輯';edit.addEventListener('click',()=>editFood(i));
+      const del=document.createElement('button');del.type='button';del.textContent='🗑️ 刪除';del.addEventListener('click',()=>deleteFood(i));
+      actions.append(edit,del);li.append(name,desc,actions);list.append(li);
+    });
+    if(!data.foods.length){const li=document.createElement('li');li.textContent='今天還沒有餐點紀錄。';li.className='muted';list.append(li);}
   }
   function addWater(amount) { data.water += amount; save(); }
   function resetWater() { data.water = 0; save(); }
@@ -297,7 +372,7 @@ function save() {
     document.getElementById('calories').textContent = data.foods.reduce((s,f)=>s+f.calories,0);
     document.getElementById('protein').textContent = data.foods.reduce((s,f)=>s+f.protein,0);
     document.getElementById('water').textContent = data.water;
-    document.getElementById('foodList').innerHTML = data.foods.map(f=>`<li>${escapeText(f.name)}：${f.calories} kcal、蛋白質 ${f.protein} g</li>`).join('');
+    renderNutrition();
     document.getElementById('weightList').innerHTML = data.weights.map(w=>`<li>${w.date}：${w.weight} kg</li>`).join('');
     renderWorkout();
   }
@@ -990,7 +1065,7 @@ ${errs}
     }, 0);
     const numberText = n => Math.round(n * 10) / 10;
     const foodHtml = foods.length ? '<ul>' + foods.map(f =>
-      `<li>${esc(f.name)}：${esc(f.calories)} kcal、蛋白質 ${esc(f.protein)} g</li>`).join('') + '</ul>' : '<p class="muted">無飲食紀錄</p>';
+      `<li>${esc(f.meal || '未分類')}｜${esc(f.name)}：${esc(f.calories)} kcal、蛋白質 ${esc(f.protein)} g、碳水 ${esc(f.carbs ?? '未記錄')} g、脂肪 ${esc(f.fat ?? '未記錄')} g</li>`).join('') + '</ul>' : '<p class="muted">無飲食紀錄</p>';
     const weightHtml = weights.length ? '<ul>' + weights.map(w =>
       `<li>${esc(w.date || date)}：${esc(w.weight)} kg</li>`).join('') + '</ul>' : '<p class="muted">無體重紀錄</p>';
     const workoutHtml = ['A', 'B'].map(k => {
@@ -1006,7 +1081,7 @@ ${errs}
     ).join('') + '</ul>' : '<p class="muted">無爬坡有氧紀錄</p>';
     result.innerHTML = `
       <div class="ex"><h3>📋 ${esc(date)} 每日摘要</h3>
-      <p>🔥 熱量：<strong>${numberText(sum('calories'))} kcal</strong>　🥚 蛋白質：<strong>${numberText(sum('protein'))} g</strong></p>
+      <p>🔥 熱量：<strong>${numberText(sum('calories'))} kcal</strong>　🥚 蛋白質：<strong>${numberText(sum('protein'))} g</strong></p><p>🍚 碳水：<strong>${numberText(sum('carbs'))} g</strong>　🥑 脂肪：<strong>${numberText(sum('fat'))} g</strong>（舊紀錄未填者視為 0）</p>
       <p>💧 喝水：<strong>${esc(water)} ml</strong>　🚶 爬坡：<strong>${numberText(minutes)} 分鐘</strong></p></div>
       <div class="ex"><h3>🍱 飲食明細</h3>${foodHtml}</div>
       <div class="ex"><h3>⚖️ 體重紀錄</h3>${weightHtml}</div>
