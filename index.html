@@ -321,6 +321,19 @@ main{padding:14px 14px calc(115px + env(safe-area-inset-bottom));max-width:480px
 @media(max-width:360px){.fit-metric{padding:12px 9px;}.fit-metric-value{font-size:21px;}.fit-quick button{min-height:58px;}}
 @media(min-width:481px){body{min-height:100vh;border-left:1px solid #EBD7C3;border-right:1px solid #EBD7C3;}main{padding-left:18px;padding-right:18px;}}
 
+
+/* AI 食物文字估算：僅新增介面，不更動既有紀錄 */
+.fit-ai-card{border:1px solid #DCC7B2;background:linear-gradient(145deg,#FFFDF9,#F7EEE4);border-radius:18px;padding:16px;margin:0 0 15px;}
+.fit-ai-card h3{margin:0 0 8px;color:#62412D;font-size:17px;}
+.fit-ai-card p{font-size:12px;color:#765E4C;line-height:1.6;}
+.fit-ai-card label{display:block;font-size:13px;margin:12px 0 5px;font-weight:600;color:#674E3C;}
+.fit-ai-card input,.fit-ai-card textarea{width:100%;min-height:44px;border-radius:11px;padding:10px;font:inherit;}
+.fit-ai-card textarea{min-height:75px;resize:vertical;}
+.fit-ai-card button{min-height:43px;margin:7px 4px 7px 0;padding:9px 12px;}
+.fit-ai-result{white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;line-height:1.7;padding:11px;background:#FFFCF7;border:1px solid #E8D9C8;border-radius:12px;margin-top:10px;}
+.fit-ai-result[hidden]{display:none;}
+.fit-ai-actions{display:flex;gap:6px;flex-wrap:wrap;}
+
 </style>
 </head>
 <body>
@@ -467,7 +480,7 @@ main{padding:14px 14px calc(115px + env(safe-area-inset-bottom));max-width:480px
     <p class="muted">統計使用此瀏覽器既有的 A／B 每日紀錄與 C 爬坡紀錄；其他裝置或瀏覽器的資料不會自動同步。舊版若未保存某日訓練，無法補算。</p>
   </section>
 
-  <p class="muted">第一版為本機瀏覽器紀錄工具，尚未連接真正的 AI 模型。教學影片連結為 YouTube 搜尋連結，請自行挑選示範清楚、來源可信的影片。動作照片只在目前頁面預覽，不會上傳、也不會儲存。</p>
+  <p class="muted">本機紀錄功能仍使用瀏覽器儲存；AI 文字營養估算需自行啟用 Cloudflare Worker，且結果僅供參考。教學影片連結為 YouTube 搜尋連結，請自行挑選示範清楚、來源可信的影片。動作照片只在目前頁面預覽，不會上傳、也不會儲存。</p>
 </main>
 <script>
   const today = new Date().toLocaleDateString('sv-SE');
@@ -1971,6 +1984,102 @@ ${errs}
     renderWater();
   })();
 
- </script>
+ 
+/* ===== AI 飲食文字估算（Cloudflare Worker；無圖片、無金鑰寫入程式）===== */
+(function initFitlifeFoodAI(){
+  const formTitle=document.getElementById('foodFormTitle');
+  if(!formTitle)return;
+  const container=formTitle.closest('.fit-food-form')||formTitle.parentElement;
+  const box=document.createElement('section');
+  box.className='fit-ai-card';
+  box.innerHTML=`
+    <h3>✨ AI 食物營養估算（測試版）</h3>
+    <p>輸入食物與份量，例如「水煮蛋 2 顆、無糖豆漿 300 ml」。AI 只提供估算，請核對份量及營養標示後再儲存。</p>
+    <label for="fitAiFoodText">食物名稱與份量</label>
+    <textarea id="fitAiFoodText" maxlength="250" placeholder="例如：雞胸肉 150g、五穀飯 100g、燙青菜一碗"></textarea>
+    <details><summary>🔐 個人存取憑證（測試時輸入）</summary>
+      <p>請輸入 Cloudflare Worker 的 APP_ACCESS_TOKEN 原始值（不是 Gemini API Key）。憑證僅保留在此頁記憶體，不寫入 GitHub、localStorage 或備份。若忘記原始值，請先在 Cloudflare 重設。</p>
+      <label for="fitAiToken">APP_ACCESS_TOKEN</label>
+      <input id="fitAiToken" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="貼上自己的存取憑證">
+    </details>
+    <div class="fit-ai-actions"><button type="button" id="fitAiAnalyze">✨ AI 估算營養</button><button type="button" class="secondary" id="fitAiClear">清除結果</button></div>
+    <div id="fitAiStatus" role="status" aria-live="polite" class="fit-note">目前伺服器若設定 AI_ENABLED=false，會顯示尚未啟用，不會呼叫 Gemini。</div>
+    <div id="fitAiResult" class="fit-ai-result" hidden></div>
+    <button type="button" id="fitAiApply" class="secondary" hidden>✏️ 將估算值帶入下方餐點表單（尚未儲存）</button>
+    <p>提醒：此功能會將你輸入的食物文字傳送至 Cloudflare Worker，再由 Worker 呼叫 Gemini。請勿輸入姓名、病歷或其他敏感個資。</p>`;
+  container.insertBefore(box,formTitle);
+  const get=id=>document.getElementById(id);
+  const endpoint='https://fitlife-ai-api.0721tfboys.workers.dev/analyze';
+  const button=get('fitAiAnalyze'),apply=get('fitAiApply'),result=get('fitAiResult');
+  let candidate=null;
+  function display(message){result.hidden=false;result.textContent=message;}
+  function findEstimate(value){
+    if(!value||typeof value!=='object')return null;
+    const keys=[['calories','kcal','calorie','熱量'],['protein','protein_g','蛋白質'],['carbs','carbohydrates','carbohydrate','碳水化合物'],['fat','fat_g','脂肪']];
+    const out={};
+    for(const group of keys){
+      const raw=group.map(k=>value[k]).find(v=>v!==undefined&&v!==null);
+      const n=typeof raw==='number'?raw:Number(String(raw??'').replace(/[^\d.]/g,''));
+      if(raw===undefined||raw===null||raw===''||!Number.isFinite(n)||n<0||n>100000)return null;
+      out[group[0]]=n;
+    }
+    return out;
+  }
+  function parseEstimate(payload){
+    const candidates=[payload,payload?.nutrition,payload?.result,payload?.data,payload?.analysis,payload?.estimate];
+    for(const obj of candidates){const x=findEstimate(obj);if(x)return x;}
+    let txt=typeof payload==='string'?payload:(payload?.text||payload?.content||payload?.answer||payload?.response||'');
+    if(Array.isArray(txt))txt=txt.map(x=>x?.text||'').join('\n');
+    if(typeof txt==='string'){
+      const cleaned=txt.trim().replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/,'');
+      try{const obj=JSON.parse(cleaned);return findEstimate(obj)||findEstimate(obj?.nutrition)||null;}catch(e){}
+    }
+    return null;
+  }
+  button.addEventListener('click',async()=>{
+    const food=get('fitAiFoodText').value.trim(),token=get('fitAiToken').value.trim();
+    if(!food){get('fitAiStatus').textContent='請先輸入食物與份量。';return;}
+    if(!token){get('fitAiStatus').textContent='請先展開「個人存取憑證」並輸入 APP_ACCESS_TOKEN。';return;}
+    candidate=null;apply.hidden=true;result.hidden=true;
+    button.disabled=true;button.textContent='估算中…';get('fitAiStatus').textContent='正在連線，請稍候。';
+    const controller=new AbortController();
+    const timeout=setTimeout(()=>controller.abort(),25000);
+    try{
+      const response=await fetch(endpoint,{method:'POST',mode:'cors',cache:'no-store',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({type:'food_text',text:food}),signal:controller.signal});
+      const raw=await response.text();let payload;
+      try{payload=JSON.parse(raw);}catch(e){payload={text:raw};}
+      if(!response.ok){
+        const error=typeof payload?.error==='string'?payload.error:'伺服器回應 HTTP '+response.status;
+        get('fitAiStatus').textContent='估算未完成（HTTP '+response.status+'）。';
+        display(error+(response.status===503?'\n請先確認 Cloudflare Worker 的 AI_ENABLED 設定。':response.status===401?'\n請確認 APP_ACCESS_TOKEN 是否正確。':''));
+        return;
+      }
+      const estimate=parseEstimate(payload);
+      const text=typeof payload?.text==='string'?payload.text:typeof payload?.result==='string'?payload.result:typeof payload?.answer==='string'?payload.answer:typeof payload?.content==='string'?payload.content:'';
+      if(estimate){
+        candidate=estimate;
+        display(`估算結果（請核對）\n熱量：${estimate.calories} kcal\n蛋白質：${estimate.protein} g\n碳水化合物：${estimate.carbs} g\n脂肪：${estimate.fat} g`+(text?'\n\n'+text:''));
+        apply.hidden=false;
+        get('fitAiStatus').textContent='估算成功。確認數值後可帶入表單，仍需手動按「儲存餐點」。';
+      }else{
+        display(text||JSON.stringify(payload,null,2).slice(0,3000));
+        get('fitAiStatus').textContent='已收到回應，但格式無法安全自動填入。請核對並手動輸入營養數值。';
+      }
+    }catch(e){
+      get('fitAiStatus').textContent='連線未完成。';
+      display(e?.name==='AbortError'?'連線逾時，請稍後重試。':'連線失敗，請確認網路、Cloudflare Worker 及跨網域設定。');
+    }finally{clearTimeout(timeout);button.disabled=false;button.textContent='✨ AI 估算營養';}
+  });
+  apply.addEventListener('click',()=>{
+    if(!candidate)return;
+    get('food').value=get('fitAiFoodText').value.trim().slice(0,250);
+    for(const [k,id] of [['calories','calorieInput'],['protein','proteinInput'],['carbs','carbsInput'],['fat','fatInput']])get(id).value=candidate[k];
+    get('fitAiStatus').textContent='已帶入餐點表單，但尚未儲存。請確認份量、餐別與數值，再按「儲存餐點」。';
+    formTitle.scrollIntoView({behavior:'smooth',block:'start'});
+  });
+  get('fitAiClear').addEventListener('click',()=>{candidate=null;result.hidden=true;apply.hidden=true;get('fitAiStatus').textContent='已清除估算結果。';});
+})();
+
+</script>
 </body>
 </html>
