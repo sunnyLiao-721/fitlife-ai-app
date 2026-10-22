@@ -2015,7 +2015,7 @@ ${errs}
   function display(message){result.hidden=false;result.textContent=message;}
   function findEstimate(value){
     if(!value||typeof value!=='object')return null;
-    const keys=[['calories','kcal','calorie','熱量'],['protein','protein_g','蛋白質'],['carbs','carbohydrates','carbohydrate','碳水化合物'],['fat','fat_g','脂肪']];
+    const keys=[['calories','calories_kcal','kcal','calorie','熱量'],['protein','protein_g','蛋白質'],['carbs','carbs_g','carbohydrates','carbohydrate','碳水化合物'],['fat','fat_g','脂肪']];
     const out={};
     for(const group of keys){
       const raw=group.map(k=>value[k]).find(v=>v!==undefined&&v!==null);
